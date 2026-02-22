@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>মাদ্রাসা ম্যানেজমেন্ট</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 10px; text-align: center; }
+        .container { max-width: 600px; margin: auto; }
+        
+        /* ড্যাশবোর্ড স্টাইল */
+        #dashboard { display: block; }
+        .header { background: #1a5d1a; color: white; padding: 20px; border-radius: 10px; }
+        .welcome { margin: 20px 0; font-weight: bold; color: #333; }
+        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .menu-btn { background: white; border: 2px solid #1a5d1a; padding: 15px; border-radius: 10px; color: #1a5d1a; font-weight: bold; cursor: pointer; }
+
+        /* ছাত্র নিবন্ধন পেইজ স্টাইল */
+        #student_page { display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: left; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .submit-btn { background: #1a5d1a; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .back-btn { background: #555; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; margin-top: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="dashboard">
+        <div class="header">
+            <h2>হিফজুল কুরআন রশিদিয়া হোসাইনিয়া নূরানী মাদ্রাসা</h2>
+            <p>সৈয়দ রশিদিয়া মঞ্জিল, বরিশাল সদর।</p>
+        </div>
+        <p class="welcome">আসসালামুয়ালাইকুম, মাদ্রাসা ম্যানেজমেন্ট অ্যাপসে আপনাকে স্বাগতম</p>
+        
+        <div class="menu-grid">
+            <button class="menu-btn" onclick="openStudent()">১/ ছাত্র ছাত্রী নিবন্ধন</button>
+            <button class="menu-btn">২/ শিক্ষক নিবন্ধন</button>
+            <button class="menu-btn">৩/ আয় এন্ট্রি</button>
+            <button class="menu-btn">৪/ ব্যয় এন্ট্রি</button>
+            <button class="menu-btn">৫/ রশিদ পেইজ</button>
+            <button class="menu-btn">৬/ উপস্থিত অনুপস্থিত পেইজ</button>
+            <button class="menu-btn">৭/ ফলাফল পেইজ</button>
+            <button class="menu-btn">৮/ অন্যান্য (নোটিশ)</button>
+        </div>
+    </div>
+
+    <div id="student_page">
+        <h2 style="text-align:center; color:#1a5d1a;">ছাত্র-ছাত্রী নিবন্ধন</h2>
+        <label>আইডি নাম্বার (অটোমেটিক):</label>
+        <input type="text" id="stu_id" readonly style="background:#eee;">
+        
+        <label>শিক্ষার্থীর নাম:</label>
+        <input type="text" placeholder="নাম লিখুন">
+        
+        <label>পিতার নাম:</label>
+        <input type="text" placeholder="পিতার নাম লিখুন">
+        
+        <label>শ্রেণী:</label>
+        <select>
+            <option>নূরানী</option>
+            <option>নাজেরা</option>
+            <option>হিফজ</option>
+        </select>
+        
+        <label>ঠিকানা:</label>
+        <textarea placeholder="ঠিকানা লিখুন"></textarea>
+        
+        <label>মোবাইল নাম্বার:</label>
+        <input type="tel" placeholder="০১৭xxxxxxxx">
+        
+        <button class="submit-btn">তথ্য সেভ করুন</button>
+        <button class="back-btn" onclick="goHome()">← ড্যাশবোর্ডে ফিরে যান</button>
+    </div>
+</div>
+
+<script>
+    function openStudent() {
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('student_page').style.display = 'block';
+        document.getElementById('stu_id').value = "ID-" + Math.floor(1000 + Math.random() * 9000);
+    }
+
+    function goHome() {
+        document.getElementById('student_page').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
+<div id="teacher_page" style="display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: left; max-width: 600px; margin: auto;">
+    <h2 style="text-align:center; color:#1a5d1a;">শিক্ষক নিবন্ধন</h2>
+    
+    <label style="font-weight:bold;">শিক্ষক আইডি (অটোমেটিক):</label>
+    <input type="text" id="teach_id" readonly style="width: 100%; padding: 10px; margin: 8px 0; background:#eee; border: 1px solid #ccc; border-radius: 5px;">
+    
+    <label style="font-weight:bold;">শিক্ষকের নাম:</label>
+    <input type="text" id="t_name" placeholder="পুরো নাম লিখুন" style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;">
+    
+    <label style="font-weight:bold;">পদবী:</label>
+    <select id="t_desig" style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;">
+        <option>প্রধান শিক্ষক</option>
+        <option>সহকারী শিক্ষক</option>
+        <option>মুহতামিম</option>
+        <option>ক্বারী</option>
+        <option>অন্যান্য</option>
+    </select>
+    
+    <label style="font-weight:bold;">ঠিকানা:</label>
+    <textarea id="t_address" placeholder="ঠিকানা লিখুন" style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+    
+    <label style="font-weight:bold;">মোবাইল নাম্বার:</label>
+    <input type="tel" id="t_mobile" placeholder="০১৭xxxxxxxx" style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;">
+    
+    <button class="submit-btn" style="background: #1a5d1a; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer;">তথ্য সেভ করুন</button>
+    <button class="back-btn" onclick="goHomeFromTeacher()" style="background: #555; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; margin-top: 10px; cursor: pointer;">← ড্যাশবোর্ডে ফিরে যান</button>
+</div>
+
+<script>
+    // ২ নম্বর শিক্ষক নিবন্ধন বাটন কাজ করানোর জন্য
+    document.querySelectorAll('.menu-btn')[1].onclick = function() {
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('teacher_page').style.display = 'block';
+        document.getElementById('teach_id').value = "TID-" + Math.floor(2000 + Math.random() * 8000);
+    };
+
+    function goHomeFromTeacher() {
+        document.getElementById('teacher_page').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+    }
+</script>
+<div id="income_page" style="display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: left; max-width: 600px; margin: auto;">
+    <h2 style="text-align:center; color:#1a5d1a;">আয় এন্ট্রি (রশিদ)</h2>
+    
+    <div style="background: #e8f5e9; padding: 10px; border-radius: 5px; margin-bottom: 15px; display: flex; gap: 5px;">
+        <input type="text" id="search_id" placeholder="ছাত্র আইডি দিয়ে সার্চ দিন" style="flex: 3; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+        <button onclick="searchStudent()" style="flex: 1; background: #1a5d1a; color: white; border: none; border-radius: 5px; cursor: pointer;">সার্চ</button>
+    </div>
+
+    <div style="margin-bottom: 10px; font-weight: bold; color: #555;">
+        নাম: <span id="res_name" style="color: #000;">---</span> | 
+        শ্রেণী: <span id="res_class" style="color: #000;">---</span>
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+        <div style="flex: 1;">
+            <label>মাস নির্বাচন করুন:</label>
+            <select id="inc_month" style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;">
+                <option>জানুয়ারি</option><option>ফেব্রুয়ারি</option><option>মার্চ</option><option>এপ্রিল</option>
+                <option>মে</option><option>জুন</option><option>জুলাই</option><option>আগস্ট</option>
+                <option>সেপ্টেম্বর</option><option>অক্টোবর</option><option>নভেম্বর</option><option>ডিসেম্বর</option>
+            </select>
+        </div>
+        <div style="flex: 1;">
+            <label>তারিখ:</label>
+            <input type="text" id="inc_date" readonly style="width: 100%; padding: 10px; margin: 8px 0; background:#eee; border: 1px solid #ccc; border-radius: 5px;">
+        </div>
+    </div>
+
+    <label>আয়ের খাত:</label>
+    <select style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;">
+        <option>বেতন বাবদ</option>
+        <option>ভর্তি বাবদ</option>
+        <option>পরীক্ষার ফি</option>
+        <option>কারেন্ট বিল</option>
+        <option>আবাসিক খোরাকি</option>
+        <option>অন্যান্য</option>
+    </select>
+
+    <label>টাকার পরিমাণ:</label>
+    <input type="number" placeholder="০.০০" style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; font-size: 18px; font-weight: bold;">
+
+    <button class="submit-btn" style="background: #1a5d1a; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer;">আয় সেভ করুন</button>
+    <button class="back-btn" onclick="goHomeFromIncome()" style="background: #555; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; margin-top: 10px; cursor: pointer;">← ড্যাশবোর্ডে ফিরে যান</button>
+</div>
+
+<script>
+    // ৩ নম্বর আয় এন্ট্রি বাটন কাজ করানোর জন্য
+    document.querySelectorAll('.menu-btn')[2].onclick = function() {
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('income_page').style.display = 'block';
+        
+        // অটো তারিখ বসানো
+        let today = new Date();
+        document.getElementById('inc_date').value = today.toLocaleDateString('bn-BD');
+    };
+
+    function searchStudent() {
+        let id = document.getElementById('search_id').value;
+        if(id) {
+            // ডেমো তথ্য শো করা (পরবর্তীতে ডাটাবেজ থেকে আসবে)
+            document.getElementById('res_name').innerText = "আব্দুল্লাহ আল মামুন";
+            document.getElementById('res_class').innerText = "হিফজ";
+        } else {
+            alert("অনুগ্রহ করে আইডি দিন");
+        }
+    }
+
+    function goHomeFromIncome() {
+        document.getElementById('income_page').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+    }
+</script>
+<div id="expense_page" style="display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: left; max-width: 600px; margin: auto;">
+    <h2 style="text-align:center; color:#c0392b;">ব্যয় এন্ট্রি</h2>
+    
+    <div style="display: flex; gap: 10px;">
+        <div style="flex: 1;">
+            <label style="font-weight:bold;">মাস নির্বাচন:</label>
+            <select id="exp_month" style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;">
+                <option>জানুয়ারি</option><option>ফেব্রুয়ারি</option><option>মার্চ</option><option>এপ্রিল</option>
+                <option>মে</option><option>জুন</option><option>জুলাই</option><option>আগস্ট</option>
+                <option>সেপ্টেম্বর</option><option>অক্টোবর</option><option>নভেম্বর</option><option>ডিসেম্বর</option>
+            </select>
+        </div>
+        <div style="flex: 1;">
+            <label style="font-weight:bold;">তারিখ:</label>
+            <input type="text" id="exp_date" readonly style="width: 100%; padding: 10px; margin: 8px 0; background:#f9f9f9; border: 1px solid #ccc; border-radius: 5px;">
+        </div>
+    </div>
+
+    <label style="font-weight:bold;">ব্যয়ের খাত:</label>
+    <select style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;">
+        <option>শিক্ষক বেতন</option>
+        <option>বাজার বাবদ</option>
+        <option>আসবাবপত্র</option>
+        <option>মাদ্রাসা সামগ্রী</option>
+        <option>যাতায়াত খরচ</option>
+        <option>অন্যান্য</option>
+    </select>
+
+    <label style="font-weight:bold;">টাকার পরিমাণ:</label>
+    <input type="number" placeholder="০.০০" style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; font-size: 18px; color: #c0392b; font-weight: bold;">
+
+    <label style="font-weight:bold;">খরচের বিবরণ (ঐচ্ছিক):</label>
+    <textarea placeholder="বিস্তারিত এখানে লিখুন..." style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+
+    <button class="submit-btn" style="background: #c0392b; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer;">ব্যয় সেভ করুন</button>
+    <button class="back-btn" onclick="goHomeFromExpense()" style="background: #555; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; margin-top: 10px; cursor: pointer;">← ড্যাশবোর্ডে ফিরে যান</button>
+</div>
+
+<script>
+    // ৪ নম্বর ব্যয় এন্ট্রি বাটন কাজ করানোর জন্য
+    document.querySelectorAll('.menu-btn')[3].onclick = function() {
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('expense_page').style.display = 'block';
+        
+        // অটো তারিখ সেট করা
+        let today = new Date();
+        document.getElementById('exp_date').value = today.toLocaleDateString('bn-BD');
+    };
+
+    function goHomeFromExpense() {
+        document.getElementById('expense_page').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+    }
+</script>
+<div id="receipt_page" style="display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 700px; margin: auto;">
+    
+    <div class="no-print">
+        <h2 style="text-align:center; color:#1a5d1a;">রশিদ অনুসন্ধান ও ডাউনলোড</h2>
+        <div style="background: #e8f5e9; padding: 15px; border-radius: 5px; margin-bottom: 20px; display: flex; gap: 5px;">
+            <input type="text" id="search_receipt_id" placeholder="ছাত্র আইডি লিখে সার্চ দিন" style="flex: 3; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+            <button onclick="findReceipts()" style="flex: 1; background: #1a5d1a; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">সার্চ</button>
+        </div>
+    </div>
+
+    <div id="printArea" style="border: 3px double #1a5d1a; padding: 30px; border-radius: 10px; background: #fff; position: relative;">
+        
+        <div style="text-align: center; border-bottom: 2px solid #1a5d1a; margin-bottom: 15px; padding-bottom: 10px;">
+            <h2 style="margin: 0; color: #1a5d1a; font-size: 24px;">হিফজুল কুরআন রশিদিয়া হোসাইনিয়া নূরানী মাদ্রাসা</h2>
+            <p style="margin: 5px 0; font-size: 15px;">সৈয়দ রশিদিয়া মঞ্জিল, বরিশাল সদর।</p>
+            <div style="margin-top: 10px; background: #1a5d1a; color: white; display: inline-block; padding: 5px 20px; border-radius: 50px; font-weight: bold;">টাকা প্রাপ্তির রশিদ</div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: bold;">
+            <span>ছাত্র আইডি: <span id="rec_id_val">---</span></span>
+            <span>তারিখ: <span id="rec_date_val">---</span></span>
+        </div>
+        
+        <div style="text-align: left; line-height: 2; margin-bottom: 15px; font-size: 16px;">
+            নাম: <strong id="rec_name_val">---</strong> <br>
+            শ্রেণী: <strong id="rec_class_val">---</strong>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <thead>
+                <tr style="background: #f4f4f4;">
+                    <th style="border: 1px solid #1a5d1a; padding: 12px; text-align: left;">টাকা প্রদানের বিবরণ (খাত)</th>
+                    <th style="border: 1px solid #1a5d1a; padding: 12px; text-align: center;">মাস</th>
+                    <th style="border: 1px solid #1a5d1a; padding: 12px; text-align: right;">টাকার পরিমাণ</th>
+                </tr>
+            </thead>
+            <tbody id="receipt_table_body">
+                <tr>
+                    <td style="border: 1px solid #1a5d1a; padding: 12px;">---</td>
+                    <td style="border: 1px solid #1a5d1a; padding: 12px; text-align: center;">---</td>
+                    <td style="border: 1px solid #1a5d1a; padding: 12px; text-align: right;">০.০০</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr style="font-weight: bold; background: #e8f5e9;">
+                    <td colspan="2" style="border: 1px solid #1a5d1a; padding: 12px; text-align: right;">সর্বমোট টাকা:</td>
+                    <td id="rec_total_val" style="border: 1px solid #1a5d1a; padding: 12px; text-align: right;">০.০০</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 60px;">
+            <div style="border-top: 1px solid #000; width: 140px; text-align: center; font-size: 14px;">আদায়কারীর স্বাক্ষর</div>
+            <div style="border-top: 1px solid #000; width: 140px; text-align: center; font-size: 14px;">মুহতামিম/অফিস</div>
+        </div>
+    </div>
+
+    <div class="no-print" style="margin-top: 25px; display: flex; gap: 10px;">
+        <button onclick="window.print()" style="flex: 1; padding: 15px; background: #2c3e50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px;">⬇ রশিদ ডাউনলোড / প্রিন্ট</button>
+        <button onclick="goHomeFromReceipt()" style="flex: 1; padding: 15px; background: #555; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">← ড্যাশবোর্ডে ফিরুন</button>
+    </div>
+</div>
+
+<style>
+    /* প্রিন্ট করার সময় বাটন এবং অপ্রয়োজনীয় জিনিস লুকানোর জন্য */
+    @media print {
+        .no-print, .header, .welcome, .menu-grid { display: none !important; }
+        body { background: white; padding: 0; }
+        #receipt_page { display: block !important; box-shadow: none; max-width: 100%; margin: 0; padding: 0; }
+        .container { width: 100%; padding: 0; }
+    }
+</style>
+
+<script>
+    // ৫ নম্বর রশিদ পেইজ বাটন অ্যাক্টিভ করা
+    document.querySelectorAll('.menu-btn')[4].onclick = function() {
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('receipt_page').style.display = 'block';
+    };
+
+    // আইডি দিয়ে তথ্য খোঁজার ডেমো ফাংশন
+    function findReceipts() {
+        let id = document.getElementById('search_receipt_id').value;
+        if(id) {
+            // আপাতত ডেমো তথ্য দেখাচ্ছে, পরে ডাটাবেজ কানেক্ট হবে
+            document.getElementById('rec_id_val').innerText = id;
+            document.getElementById('rec_date_val').innerText = new Date().toLocaleDateString('bn-BD');
+            document.getElementById('rec_name_val').innerText = "মোহাম্মদ আব্দুল্লাহ";
+            document.getElementById('rec_class_val').innerText = "নূরানী (৩য় শ্রেণী)";
+            
+            document.getElementById('receipt_table_body').innerHTML = `
+                <tr>
+                    <td style="border: 1px solid #1a5d1a; padding: 12px;">মাসিক বেতন</td>
+                    <td style="border: 1px solid #1a5d1a; padding: 12px; text-align: center;">ফেব্রুয়ারি</td>
+                    <td style="border: 1px solid #1a5d1a; padding: 12px; text-align: right;">৫০০.০০</td>
+                </tr>
+            `;
+            document.getElementById('rec_total_val').innerText = "৫০০.০০";
+        } else {
+            alert("অনুগ্রহ করে ছাত্র আইডি দিন");
+        }
+    }
+
+    function goHomeFromReceipt() {
+        document.getElementById('receipt_page').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+    }
+</script><div id="attendance_page" style="display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 700px; margin: auto;">
+    <h2 style="text-align:center; color:#1a5d1a;">শিক্ষার্থী হাজিরা (Attendance)</h2>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr;
