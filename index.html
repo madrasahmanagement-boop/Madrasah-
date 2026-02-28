@@ -312,4 +312,382 @@
                 <label>ছাত্র আইডি দিয়ে মার্কশিট খুঁজুন:</label>
                 <div style="display:flex; gap:5px; margin-top:5px;">
                     <input type="text" id="view_stu_id" placeholder="আইডি লিখুন" style="flex:3; margin:0;">
-                    <button onclick="generateMarksheet()" style="flex:1; background:#1a5d1a; color:white; border:none; cursor:pointer; font-weight:b
+                    <button onclick="generateMarksheet()" style="flex:1; background:#1a5d1a; color:white; border:none; cursor:pointer; font-weight:bold; border-radius:5px; padding:10px;">সার্চ</button>
+                </div>
+            </div>
+            <div id="marksheet_output" style="border:2px solid #ddd; padding:20px; background:white; border-radius:5px; min-height:80px;">
+                <p style="text-align:center; color:#999;">আইডি দিয়ে সার্চ করুন</p>
+            </div>
+        </div>
+        <button class="back-btn" onclick="goHome('result_page')" style="margin-top:12px;">← ড্যাশবোর্ডে ফিরে যান</button>
+    </div>
+
+    <!-- ৮/ রিপোর্ট ও নোটিশ -->
+    <div id="other_page" class="page" style="max-width:800px;">
+        <h2 style="text-align:center; color:#1a5d1a;">রিপোর্ট ও নোটিশ বোর্ড</h2>
+        <div style="background:#fdfefe; border:1px solid #1a5d1a; padding:15px; border-radius:8px; margin-bottom:20px;">
+            <h4 style="margin-top:0; color:#1a5d1a;">📊 আয়-ব্যয় রিপোর্ট</h4>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+                <div>
+                    <label style="font-size:12px;">মাস নির্বাচন:</label>
+                    <select id="rep_month" style="padding:8px; width:100%; margin:0;">
+                        <option value="">সব মাস</option>
+                        <option>জানুয়ারি</option><option>ফেব্রুয়ারি</option><option>মার্চ</option><option>এপ্রিল</option>
+                        <option>মে</option><option>জুন</option><option>জুলাই</option><option>আগস্ট</option>
+                        <option>সেপ্টেম্বর</option><option>অক্টোবর</option><option>নভেম্বর</option><option>ডিসেম্বর</option>
+                    </select>
+                </div>
+                <div style="display:flex; align-items:flex-end;">
+                    <button onclick="loadReport()" style="width:100%; padding:10px; background:#1a5d1a; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">রিপোর্ট দেখুন</button>
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; text-align:center;">
+                <div style="background:#e8f5e9; padding:12px; border-radius:8px;">
+                    <div style="font-size:12px; color:#2e7d32;">মোট আয়</div>
+                    <h3 style="margin:5px 0; color:#2e7d32;">৳<span id="total_inc_rep">০</span></h3>
+                </div>
+                <div style="background:#ffebee; padding:12px; border-radius:8px;">
+                    <div style="font-size:12px; color:#c62828;">মোট ব্যয়</div>
+                    <h3 style="margin:5px 0; color:#c62828;">৳<span id="total_exp_rep">০</span></h3>
+                </div>
+                <div style="background:#e3f2fd; padding:12px; border-radius:8px;">
+                    <div style="font-size:12px; color:#1565c0;">অবশিষ্ট</div>
+                    <h3 style="margin:5px 0; color:#1565c0;">৳<span id="balance_rep">০</span></h3>
+                </div>
+            </div>
+        </div>
+        <div style="background:#fff9c4; border:1px solid #fbc02d; padding:15px; border-radius:8px;">
+            <h4 style="margin-top:0; color:#f57f17;">📢 নোটিশ বোর্ড</h4>
+            <textarea id="notice_input" placeholder="নতুন নোটিশ লিখুন..." style="height:70px; border-color:#fbc02d;"></textarea>
+            <button onclick="publishNotice()" style="width:100%; padding:10px; background:#f57f17; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">নোটিশ পাবলিশ করুন</button>
+            <div id="notice_list" style="margin-top:12px; background:white; padding:10px; border-radius:5px; border:1px dashed #fbc02d; min-height:50px; font-size:13px;">
+                <p style="color:#666; text-align:center;">লোড হচ্ছে...</p>
+            </div>
+        </div>
+        <button class="back-btn" onclick="goHome('other_page')" style="margin-top:20px;">← ড্যাশবোর্ডে ফিরে যান</button>
+    </div>
+
+    <!-- AI সহকারী পেজ -->
+    <div id="ai_page" class="page" style="max-width:700px;">
+        <div style="background:linear-gradient(135deg,#1a1a2e,#16213e); color:white; padding:15px; border-radius:10px; margin-bottom:15px; text-align:center;">
+            <h2 style="margin:0; font-size:18px;">🤖 AI সহকারী</h2>
+            <p style="margin:5px 0 0; font-size:13px; opacity:0.8;">যেকোনো সমস্যা বাংলায় লিখুন — AI সমাধান দেবে</p>
+        </div>
+        <div id="ai_chat_box" style="background:#f9f9f9; border:1px solid #ddd; border-radius:8px; padding:12px; min-height:300px; max-height:400px; overflow-y:auto; margin-bottom:10px; font-size:14px; line-height:1.6;">
+            <div style="background:#e8f5e9; padding:10px; border-radius:8px; margin-bottom:8px;">
+                <strong>🤖 AI:</strong> আসসালামুয়ালাইকুম! আমি আপনার মাদ্রাসা অ্যাপের AI সহকারী। আপনার যেকোনো সমস্যা বা পরিবর্তনের কথা বলুন, আমি সাহায্য করব! 😊
+            </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+            <textarea id="ai_input" placeholder="এখানে আপনার সমস্যা বা প্রশ্ন লিখুন..." style="flex:1; height:70px; margin:0; font-size:14px; border-color:#1a1a2e;"></textarea>
+            <button onclick="sendAIMessage()" id="ai_send_btn" style="width:70px; background:linear-gradient(135deg,#1a1a2e,#16213e); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:20px;">➤</button>
+        </div>
+        <button class="back-btn" onclick="goHome('ai_page')" style="margin-top:10px;">← ড্যাশবোর্ডে ফিরে যান</button>
+    </div>
+
+</div>
+
+<script>
+function openPage(pageId, initFn) {
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById(pageId).style.display = 'block';
+    if(initFn) initFn();
+}
+function goHome(pageId) {
+    document.getElementById(pageId).style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+}
+function showSuccess(id) {
+    let el = document.getElementById(id);
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 3000);
+}
+function genId(prefix) { return prefix + "-" + Date.now().toString().slice(-6); }
+function makeTable(headers, rows) {
+    if(!rows || rows.length === 0) return '<p style="text-align:center; color:#999; padding:10px;">কোনো তথ্য নেই।</p>';
+    let html = '<div style="overflow-x:auto;"><table><thead><tr>';
+    headers.forEach(h => html += '<th>' + h + '</th>');
+    html += '</tr></thead><tbody>';
+    rows.forEach(r => { html += '<tr>'; r.forEach(c => html += '<td>' + (c||'---') + '</td>'); html += '</tr>'; });
+    return html + '</tbody></table></div>';
+}
+
+function updateClassOptions() {
+    let division = document.getElementById('stu_division').value;
+    let classSelect = document.getElementById('stu_class');
+    classSelect.innerHTML = '';
+    let options = [];
+    if(division === 'নূরানী') {
+        options = ['প্লে','নার্সারি','প্রথম শ্রেণী','দ্বিতীয় শ্রেণী','তৃতীয় শ্রেণী'];
+    } else if(division === 'নাজেরা') {
+        options = ['নাজেরা বিভাগ'];
+    } else if(division === 'হিফজ') {
+        options = ['হিফজ বিভাগ'];
+    } else {
+        options = ['-- আগে বিভাগ নির্বাচন করুন --'];
+    }
+    options.forEach(o => { let opt=document.createElement('option'); opt.value=o; opt.innerText=o; classSelect.appendChild(opt); });
+}
+// ১/ ছাত্র
+function initStudent() { document.getElementById('stu_id').value = genId('STU'); }
+function saveStudent() {
+    let id = document.getElementById('stu_id').value;
+    let name = document.getElementById('stu_name').value.trim();
+    if(!name) { alert("ছাত্রের নাম লিখুন!"); return; }
+    db.ref('students/' + id).set({ id, name, father: document.getElementById('stu_father').value.trim(), division: document.getElementById('stu_division').value, class: document.getElementById('stu_class').value, address: document.getElementById('stu_address').value.trim(), mobile: document.getElementById('stu_mobile').value.trim(), date: new Date().toLocaleDateString('bn-BD') })
+    .then(() => { showSuccess('stu_success'); ['stu_name','stu_father','stu_address','stu_mobile'].forEach(f => document.getElementById(f).value=''); document.getElementById('stu_id').value=genId('STU'); })
+    .catch(e => alert("সেভ হয়নি!\n" + e.message));
+}
+function loadStudentList() {}
+
+// ২/ শিক্ষক
+function initTeacher() { document.getElementById('teach_id').value = genId('TEA'); loadTeacherList(); }
+function saveTeacher() {
+    let id = document.getElementById('teach_id').value;
+    let name = document.getElementById('t_name').value.trim();
+    if(!name) { alert("শিক্ষকের নাম লিখুন!"); return; }
+    db.ref('teachers/' + id).set({ id, name, designation: document.getElementById('t_desig').value, address: document.getElementById('t_address').value.trim(), mobile: document.getElementById('t_mobile').value.trim(), date: new Date().toLocaleDateString('bn-BD') })
+    .then(() => { showSuccess('tea_success'); ['t_name','t_address','t_mobile'].forEach(f => document.getElementById(f).value=''); document.getElementById('teach_id').value=genId('TEA'); loadTeacherList(); })
+    .catch(e => alert("সেভ হয়নি!\n" + e.message));
+}
+function loadTeacherList() {
+    document.getElementById('tea_list').innerHTML = '<p class="loading">লোড হচ্ছে...</p>';
+    db.ref('teachers').once('value', snap => {
+        let rows = [];
+        snap.forEach(c => { let t=c.val(); rows.unshift([t.id,t.name,t.designation,t.mobile]); });
+        document.getElementById('tea_list').innerHTML = makeTable(['আইডি','নাম','পদবী','মোবাইল'], rows);
+    });
+}
+
+// ৩/ আয়
+function initIncome() { loadIncomeList(); }
+function searchStudentForIncome() {
+    let id = document.getElementById('inc_search_id').value.trim();
+    if(!id) { alert("আইডি লিখুন"); return; }
+    db.ref('students/' + id).once('value', snap => {
+        if(snap.exists()) { let s=snap.val(); document.getElementById('inc_res_name').innerText=s.name; document.getElementById('inc_res_class').innerText=s.class; }
+        else { document.getElementById('inc_res_name').innerText="পাওয়া যায়নি"; document.getElementById('inc_res_class').innerText="---"; }
+    });
+}
+function saveIncome() {
+    let amount = parseFloat(document.getElementById('inc_amount').value);
+    if(!amount||amount<=0) { alert("সঠিক টাকার পরিমাণ দিন!"); return; }
+    let key = db.ref('income').push().key;
+    db.ref('income/' + key).set({ key, studentId: document.getElementById('inc_search_id').value.trim()||'---', studentName: document.getElementById('inc_res_name').innerText, month: document.getElementById('inc_month').value, category: document.getElementById('inc_category').value, amount, date: new Date().toLocaleDateString('bn-BD') })
+    .then(() => { showSuccess('inc_success'); document.getElementById('inc_amount').value=''; document.getElementById('inc_search_id').value=''; document.getElementById('inc_res_name').innerText='---'; document.getElementById('inc_res_class').innerText='---'; loadIncomeList(); })
+    .catch(e => alert("সেভ হয়নি!\n" + e.message));
+}
+function loadIncomeList() {
+    document.getElementById('inc_list').innerHTML = '<p class="loading">লোড হচ্ছে...</p>';
+    db.ref('income').limitToLast(20).once('value', snap => {
+        let rows = [];
+        snap.forEach(c => { let i=c.val(); rows.unshift([i.studentId,i.studentName,i.category,i.month,'৳'+i.amount,i.date]); });
+        document.getElementById('inc_list').innerHTML = makeTable(['আইডি','নাম','খাত','মাস','পরিমাণ','তারিখ'], rows);
+    });
+}
+
+// ৪/ ব্যয়
+function initExpense() { loadExpenseList(); }
+function saveExpense() {
+    let amount = parseFloat(document.getElementById('exp_amount').value);
+    if(!amount||amount<=0) { alert("সঠিক টাকার পরিমাণ দিন!"); return; }
+    let key = db.ref('expenses').push().key;
+    db.ref('expenses/' + key).set({ key, month: document.getElementById('exp_month').value, category: document.getElementById('exp_category').value, amount, description: document.getElementById('exp_desc').value.trim(), date: new Date().toLocaleDateString('bn-BD') })
+    .then(() => { showSuccess('exp_success'); document.getElementById('exp_amount').value=''; document.getElementById('exp_desc').value=''; loadExpenseList(); })
+    .catch(e => alert("সেভ হয়নি!\n" + e.message));
+}
+function loadExpenseList() {
+    document.getElementById('exp_list').innerHTML = '<p class="loading">লোড হচ্ছে...</p>';
+    db.ref('expenses').limitToLast(20).once('value', snap => {
+        let rows = [];
+        snap.forEach(c => { let e=c.val(); rows.unshift([e.category,e.month,'৳'+e.amount,e.description||'---',e.date]); });
+        document.getElementById('exp_list').innerHTML = makeTable(['খাত','মাস','পরিমাণ','বিবরণ','তারিখ'], rows);
+    });
+}
+
+// ৫/ রশিদ
+function initReceipt() {}
+function findReceipts() {
+    let id = document.getElementById('search_receipt_id').value.trim();
+    if(!id) { alert("ছাত্র আইডি দিন"); return; }
+    db.ref('students/' + id).once('value', snap => {
+        if(snap.exists()) { let s=snap.val(); document.getElementById('rec_id_val').innerText=id; document.getElementById('rec_name_val').innerText=s.name; document.getElementById('rec_class_val').innerText=s.class; document.getElementById('rec_date_val').innerText=new Date().toLocaleDateString('bn-BD'); }
+        else { document.getElementById('rec_name_val').innerText="পাওয়া যায়নি"; }
+    });
+    db.ref('income').orderByChild('studentId').equalTo(id).once('value', snap => {
+        let rows='', total=0;
+        snap.forEach(c => { let i=c.val(); total+=i.amount; rows+='<tr><td style="border:1px solid #1a5d1a; padding:10px;">'+i.category+'</td><td style="border:1px solid #1a5d1a; padding:10px; text-align:center;">'+i.month+'</td><td style="border:1px solid #1a5d1a; padding:10px; text-align:right;">৳'+i.amount+'</td></tr>'; });
+        document.getElementById('receipt_table_body').innerHTML = rows||'<tr><td colspan="3" style="text-align:center; color:#999; padding:10px; border:1px solid #1a5d1a;">কোনো আয় এন্ট্রি নেই</td></tr>';
+        document.getElementById('rec_total_val').innerText = '৳' + total;
+    });
+}
+
+// ৬/ উপস্থিতি
+function initAttendance() { document.getElementById('att_date_val').value = new Date().toLocaleDateString('bn-BD'); }
+function loadStudentListForAtt() {
+    let cls = document.getElementById('select_class').value;
+    if(!cls) { document.getElementById('att_table_container').style.display='none'; return; }
+    document.getElementById('att_table_container').style.display='block';
+    document.getElementById('att_loading').style.display='block';
+    document.getElementById('att_student_table').style.display='none';
+    db.ref('students').orderByChild('class').equalTo(cls).once('value', snap => {
+        document.getElementById('att_loading').style.display='none';
+        let body='', count=0;
+        snap.forEach(c => { let s=c.val(); count++; body+='<tr><td>'+s.id+'</td><td>'+s.name+'</td><td style="text-align:center;"><input type="checkbox" data-id="'+s.id+'" data-name="'+s.name+'" onchange="calculateAttendance()" style="width:20px; height:20px; cursor:pointer;"></td></tr>'; });
+        document.getElementById('student_list_body').innerHTML = count===0 ? '<tr><td colspan="3" style="text-align:center; padding:15px; color:#999;">এই শ্রেণীতে কোনো ছাত্র নেই।</td></tr>' : body;
+        document.getElementById('att_student_table').style.display='table';
+        document.getElementById('total_st').innerText=count;
+        document.getElementById('present_st').innerText='০';
+        document.getElementById('absent_st').innerText=count;
+    });
+}
+function calculateAttendance() {
+    let total=parseInt(document.getElementById('total_st').innerText), present=0;
+    document.querySelectorAll('#student_list_body input[type="checkbox"]').forEach(cb => { if(cb.checked) present++; });
+    document.getElementById('present_st').innerText=present;
+    document.getElementById('absent_st').innerText=total-present;
+}
+function saveAttendance() {
+    let cls=document.getElementById('select_class').value, date=document.getElementById('att_date_val').value;
+    let checkboxes=document.querySelectorAll('#student_list_body input[type="checkbox"]');
+    if(checkboxes.length===0) { alert("আগে শ্রেণী নির্বাচন করুন"); return; }
+    let presentList=[], absentList=[];
+    checkboxes.forEach(cb => { if(cb.checked) presentList.push(cb.dataset.id); else absentList.push(cb.dataset.id); });
+    let key=db.ref('attendance').push().key;
+    db.ref('attendance/'+key).set({ key, class:cls, date, presentList, absentList, presentCount:presentList.length, absentCount:absentList.length })
+    .then(() => showSuccess('att_success'))
+    .catch(e => alert("সেভ হয়নি!\n"+e.message));
+}
+
+// ৭/ ফলাফল
+function initResult() {}
+function switchResTab(tab) {
+    document.getElementById('res_entry_sec').style.display=tab==='entry'?'block':'none';
+    document.getElementById('res_view_sec').style.display=tab==='view'?'block':'none';
+    document.getElementById('btn_ent').style.background=tab==='entry'?'#1a5d1a':'#eee';
+    document.getElementById('btn_ent').style.color=tab==='entry'?'white':'#333';
+    document.getElementById('btn_viw').style.background=tab==='view'?'#1a5d1a':'#eee';
+    document.getElementById('btn_viw').style.color=tab==='view'?'white':'#333';
+}
+function updateSubjects() {
+    let dept=document.getElementById('ent_stu_class').value, fields=document.getElementById('subject_fields');
+    fields.innerHTML='';
+    let subs=dept==='general'?['বাংলা','অংক','ইংরেজি','আরবী ১ম','আরবী ২য়','দোয়া ও হাদিস','মাসআলা']:dept==='hifz'?['কুরআন মাজিদ','তাজবীদ','দোয়া','মাসআলা']:[];
+    subs.forEach((s,i) => { fields.innerHTML+='<div><label style="font-size:13px;">'+s+':</label><input type="number" id="sub_'+i+'" placeholder="০-১০০" min="0" max="100" style="margin-top:4px;"></div>'; });
+    fields.dataset.subjects=JSON.stringify(subs);
+}
+function saveResult() {
+    let id=document.getElementById('ent_stu_id').value.trim(), dept=document.getElementById('ent_stu_class').value;
+    let subjects=JSON.parse(document.getElementById('subject_fields').dataset.subjects||'[]');
+    if(!id||!dept) { alert("আইডি ও বিভাগ দিন!"); return; }
+    if(subjects.length===0) { alert("বিভাগ নির্বাচন করুন!"); return; }
+    let marks={}, total=0;
+    subjects.forEach((s,i) => { let v=parseInt(document.getElementById('sub_'+i).value)||0; marks[s]=v; total+=v; });
+    let avg=(total/subjects.length).toFixed(1);
+    let grade=avg>=90?'A+':avg>=80?'A':avg>=70?'A-':avg>=60?'B':avg>=50?'C':'F';
+    let key=db.ref('results').push().key;
+    db.ref('results/'+key).set({ key, studentId:id, department:dept, marks, total, average:parseFloat(avg), grade, date:new Date().toLocaleDateString('bn-BD') })
+    .then(() => { showSuccess('res_success'); document.getElementById('ent_stu_id').value=''; updateSubjects(); })
+    .catch(e => alert("সেভ হয়নি!\n"+e.message));
+}
+function generateMarksheet() {
+    let id=document.getElementById('view_stu_id').value.trim();
+    if(!id) { alert("আইডি লিখুন"); return; }
+    document.getElementById('marksheet_output').innerHTML='<p style="text-align:center;">লোড হচ্ছে...</p>';
+    Promise.all([db.ref('students/'+id).once('value'), db.ref('results').orderByChild('studentId').equalTo(id).limitToLast(1).once('value')]).then(([stuSnap, resSnap]) => {
+        let name=stuSnap.exists()?stuSnap.val().name:'অজানা', cls=stuSnap.exists()?stuSnap.val().class:'---';
+        if(!resSnap.exists()) { document.getElementById('marksheet_output').innerHTML='<p style="text-align:center; color:#999;">কোনো ফলাফল নেই।</p>'; return; }
+        let r; resSnap.forEach(c => r=c.val());
+        let mHtml=''; for(let [s,m] of Object.entries(r.marks)) mHtml+='<p style="margin:5px 0;">'+s+': <strong>'+m+'</strong></p>';
+        document.getElementById('marksheet_output').innerHTML='<div style="text-align:center;"><h3 style="color:#1a5d1a; margin:0;">ব্যক্তিগত মার্কশিট</h3><p>আইডি: <b>'+id+'</b> | নাম: <b>'+name+'</b> | শ্রেণী: <b>'+cls+'</b></p><hr><div style="text-align:left; font-size:14px; line-height:1.8;">'+mHtml+'</div><hr><p>মোট: <b>'+r.total+'</b> | গড়: <b>'+r.average+'</b></p><h3 style="color:'+(r.grade==='F'?'red':'green')+'; margin:10px 0;">গ্রেড: '+r.grade+' '+(r.grade==='F'?'(অনুত্তীর্ণ)':'(উত্তীর্ণ)')+'</h3></div>';
+    }).catch(e => { document.getElementById('marksheet_output').innerHTML='<p style="color:red;">লোড হয়নি: '+e.message+'</p>'; });
+}
+
+// ৮/ রিপোর্ট ও নোটিশ
+function initOther() { loadNotices(); loadReport(); }
+function loadReport() {
+    let month=document.getElementById('rep_month').value, incTotal=0, expTotal=0;
+    Promise.all([
+        db.ref('income').once('value', snap => { snap.forEach(c => { let i=c.val(); if(!month||i.month===month) incTotal+=i.amount||0; }); }),
+        db.ref('expenses').once('value', snap => { snap.forEach(c => { let e=c.val(); if(!month||e.month===month) expTotal+=e.amount||0; }); })
+    ]).then(() => {
+        document.getElementById('total_inc_rep').innerText=incTotal.toFixed(2);
+        document.getElementById('total_exp_rep').innerText=expTotal.toFixed(2);
+        document.getElementById('balance_rep').innerText=(incTotal-expTotal).toFixed(2);
+    });
+}
+function publishNotice() {
+    let text=document.getElementById('notice_input').value.trim();
+    if(!text) { alert("নোটিশ লিখুন!"); return; }
+    let key=db.ref('notices').push().key;
+    db.ref('notices/'+key).set({ key, text, date:new Date().toLocaleDateString('bn-BD') })
+    .then(() => { document.getElementById('notice_input').value=''; loadNotices(); })
+    .catch(e => alert("সেভ হয়নি!\n"+e.message));
+}
+function loadNotices() {
+    document.getElementById('notice_list').innerHTML='<p style="text-align:center; color:#999;">লোড হচ্ছে...</p>';
+    db.ref('notices').limitToLast(10).once('value', snap => {
+        if(!snap.exists()) { document.getElementById('notice_list').innerHTML='<p style="color:#666; text-align:center;">কোনো নোটিশ নেই।</p>'; return; }
+        let items=[]; snap.forEach(c => items.unshift(c.val()));
+        document.getElementById('notice_list').innerHTML = items.map(n => '<div style="border-bottom:1px solid #eee; padding:8px 0;"><small style="color:red;">তারিখ: '+n.date+'</small><br><strong>'+n.text+'</strong></div>').join('');
+    });
+}
+
+// AI সহকারী
+let aiHistory = [];
+function initAI() { aiHistory = []; }
+
+async function sendAIMessage() {
+    let input = document.getElementById('ai_input').value.trim();
+    if(!input) return;
+
+    let chatBox = document.getElementById('ai_chat_box');
+    let btn = document.getElementById('ai_send_btn');
+
+    // ইউজারের মেসেজ দেখান
+    chatBox.innerHTML += '<div style="background:#dce8ff; padding:10px; border-radius:8px; margin-bottom:8px; text-align:right;"><strong>আপনি:</strong> ' + input + '</div>';
+    document.getElementById('ai_input').value = '';
+    btn.disabled = true;
+    btn.innerText = '⏳';
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // AI history তে যোগ করুন
+    aiHistory.push({ role: 'user', content: input });
+
+    try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'claude-sonnet-4-20250514',
+                max_tokens: 1000,
+                system: 'আপনি একটি মাদ্রাসা ম্যানেজমেন্ট অ্যাপের AI সহকারী। এই অ্যাপে ছাত্র নিবন্ধন, শিক্ষক নিবন্ধন, আয়-ব্যয়, রশিদ, উপস্থিতি, ফলাফল এবং নোটিশ মডিউল আছে। Firebase Realtime Database ব্যবহার করা হচ্ছে। সবসময় বাংলায় উত্তর দিন। সমস্যার সমাধান সহজভাবে বলুন।',
+                messages: aiHistory
+            })
+        });
+
+        const data = await response.json();
+        let reply = data.content && data.content[0] ? data.content[0].text : 'উত্তর পাওয়া যায়নি।';
+
+        aiHistory.push({ role: 'assistant', content: reply });
+        chatBox.innerHTML += '<div style="background:#e8f5e9; padding:10px; border-radius:8px; margin-bottom:8px;"><strong>🤖 AI:</strong> ' + reply.replace(/\n/g,'<br>') + '</div>';
+
+    } catch(e) {
+        chatBox.innerHTML += '<div style="background:#ffebee; padding:10px; border-radius:8px; margin-bottom:8px;"><strong>⚠️ Error:</strong> ইন্টারনেট সংযোগ চেক করুন।</div>';
+    }
+
+    btn.disabled = false;
+    btn.innerText = '➤';
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// Enter চাপলে পাঠানো যাবে
+document.addEventListener('keydown', function(e) {
+    if(e.key === 'Enter' && !e.shiftKey && document.getElementById('ai_input') === document.activeElement) {
+        e.preventDefault();
+        sendAIMessage();
+    }
+});
+</script>
+</body>
+</html>
