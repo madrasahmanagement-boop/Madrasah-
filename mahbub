@@ -4,365 +4,690 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>মাদ্রাসা ম্যানেজমেন্ট</title>
+
+    <!-- Firebase Realtime Database SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDJzEKUxBs13JTdqYmBD0A5QmfjotqeESw",
+            authDomain: "madrasah--apps.firebaseapp.com",
+            databaseURL: "https://madrasah--apps-default-rtdb.firebaseio.com",
+            projectId: "madrasah--apps",
+            storageBucket: "madrasah--apps.firebasestorage.app",
+            messagingSenderId: "137753891980",
+            appId: "1:137753891980:web:78039b5399e2fc0e3157a9"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+    </script>
+
     <style>
+        * { box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 10px; text-align: center; }
-        .container { max-width: 600px; margin: auto; }
-        
-        /* ড্যাশবোর্ড স্টাইল */
+        .container { max-width: 650px; margin: auto; }
         #dashboard { display: block; }
         .header { background: #1a5d1a; color: white; padding: 20px; border-radius: 10px; }
-        .welcome { margin: 20px 0; font-weight: bold; color: #333; }
+        .welcome { margin: 15px 0; font-weight: bold; color: #333; }
         .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .menu-btn { background: white; border: 2px solid #1a5d1a; padding: 15px; border-radius: 10px; color: #1a5d1a; font-weight: bold; cursor: pointer; }
-
-        /* ছাত্র নিবন্ধন পেইজ স্টাইল */
-        #student_page { display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: left; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        .submit-btn { background: #1a5d1a; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; }
-        .back-btn { background: #555; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; margin-top: 10px; cursor: pointer; }
+        .menu-btn { background: white; border: 2px solid #1a5d1a; padding: 15px 10px; border-radius: 10px; color: #1a5d1a; font-weight: bold; cursor: pointer; font-size: 13px; }
+        .menu-btn:hover { background: #e8f5e9; }
+        .page { display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: left; max-width: 700px; margin: 10px auto; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 6px 0 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+        label { font-weight: bold; color: #333; display: block; margin-top: 5px; }
+        .submit-btn { background: #1a5d1a; color: white; border: none; padding: 14px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 15px; margin-top: 5px; }
+        .submit-btn:hover { background: #145214; }
+        .back-btn { background: #555; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; margin-top: 10px; cursor: pointer; font-weight: bold; font-size: 14px; }
+        .success-msg { background: #e8f5e9; border: 1px solid #1a5d1a; color: #1a5d1a; padding: 10px; border-radius: 5px; margin: 10px 0; text-align: center; font-weight: bold; display: none; }
+        .loading { text-align: center; color: #888; padding: 15px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #1a5d1a; color: white; padding: 8px; border: 1px solid #ddd; }
+        td { padding: 8px; border: 1px solid #ddd; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            #receipt_page { display: block !important; box-shadow: none; }
+        }
     </style>
 </head>
 <body>
-
 <div class="container">
+
+    <!-- ড্যাশবোর্ড -->
     <div id="dashboard">
         <div class="header">
-            <h2>হিফজুল কুরআন রশিদিয়া হোসাইনিয়া নূরানী মাদ্রাসা</h2>
-            <p>সৈয়দ রশিদিয়া মঞ্জিল, বরিশাল সদর।</p>
+            <h2 style="margin:0; font-size:18px;">হিফজুল কুরআন রশিদিয়া হোসাইনিয়া নূরানী মাদ্রাসা</h2>
+            <p style="margin:5px 0 0; font-size:13px;">সৈয়দ রশিদিয়া মঞ্জিল, বরিশাল সদর।</p>
         </div>
         <p class="welcome">আসসালামুয়ালাইকুম, মাদ্রাসা ম্যানেজমেন্ট অ্যাপসে আপনাকে স্বাগতম</p>
-        
         <div class="menu-grid">
-            <button class="menu-btn" onclick="openStudent()">১/ ছাত্র ছাত্রী নিবন্ধন</button>
-            <button class="menu-btn">২/ শিক্ষক নিবন্ধন</button>
-            <button class="menu-btn">৩/ আয় এন্ট্রি</button>
-            <button class="menu-btn">৪/ ব্যয় এন্ট্রি</button>
-            <button class="menu-btn">৫/ রশিদ পেইজ</button>
-            <button class="menu-btn">৬/ উপস্থিত অনুপস্থিত পেইজ</button>
-            <button class="menu-btn">৭/ ফলাফল পেইজ</button>
-            <button class="menu-btn">৮/ অন্যান্য (নোটিশ)</button>
+            <button class="menu-btn" onclick="openPage('student_page', initStudent)">১/ ছাত্র-ছাত্রী নিবন্ধন</button>
+            <button class="menu-btn" onclick="openPage('teacher_page', initTeacher)">২/ শিক্ষক নিবন্ধন</button>
+            <button class="menu-btn" onclick="openPage('income_page', initIncome)">৩/ আয় এন্ট্রি</button>
+            <button class="menu-btn" onclick="openPage('expense_page', initExpense)">৪/ ব্যয় এন্ট্রি</button>
+            <button class="menu-btn" onclick="openPage('receipt_page', initReceipt)">৫/ রশিদ পেইজ</button>
+            <button class="menu-btn" onclick="openPage('attendance_page', initAttendance)">৬/ উপস্থিত/অনুপস্থিত</button>
+            <button class="menu-btn" onclick="openPage('result_page', initResult)">৭/ ফলাফল পেইজ</button>
+            <button class="menu-btn" onclick="openPage('other_page', initOther)">৮/ রিপোর্ট ও নোটিশ</button>
         </div>
+        <button onclick="openPage('ai_page', initAI)" style="width:100%; margin-top:12px; padding:14px; background:linear-gradient(135deg,#1a1a2e,#16213e); color:white; border:none; border-radius:10px; font-weight:bold; font-size:14px; cursor:pointer;">🤖 AI সহকারী — সমস্যা সমাধান করুন</button>
     </div>
 
-    <div id="student_page">
+    <!-- ১/ ছাত্র নিবন্ধন -->
+    <div id="student_page" class="page">
         <h2 style="text-align:center; color:#1a5d1a;">ছাত্র-ছাত্রী নিবন্ধন</h2>
+        <div id="stu_success" class="success-msg">✅ তথ্য সফলভাবে সেভ হয়েছে!</div>
         <label>আইডি নাম্বার (অটোমেটিক):</label>
         <input type="text" id="stu_id" readonly style="background:#eee;">
-        
         <label>শিক্ষার্থীর নাম:</label>
-        <input type="text" placeholder="নাম লিখুন">
-        
+        <input type="text" id="stu_name" placeholder="নাম লিখুন">
         <label>পিতার নাম:</label>
-        <input type="text" placeholder="পিতার নাম লিখুন">
-        
-        <label>শ্রেণী:</label>
-        <select>
+        <input type="text" id="stu_father" placeholder="পিতার নাম লিখুন">
+        <label>শ্রেণী বিভাগ:</label>
+        <select id="stu_division">
             <option>নূরানী</option>
             <option>নাজেরা</option>
             <option>হিফজ</option>
         </select>
-        
+        <label>শ্রেণী:</label>
+        <select id="stu_class">
+            <option>প্লে</option>
+            <option>নার্সারি</option>
+            <option>প্রথম শ্রেণী</option>
+            <option>দ্বিতীয় শ্রেণী</option>
+            <option>তৃতীয় শ্রেণী</option>
+            <option>হিফজ বিভাগ</option>
+            <option>নাজেরা বিভাগ</option>
+        </select>
         <label>ঠিকানা:</label>
-        <textarea placeholder="ঠিকানা লিখুন"></textarea>
-        
+        <textarea id="stu_address" placeholder="ঠিকানা লিখুন" rows="2"></textarea>
         <label>মোবাইল নাম্বার:</label>
-        <input type="tel" placeholder="০১৭xxxxxxxx">
-        
-        <button class="submit-btn">তথ্য সেভ করুন</button>
-        <button class="back-btn" onclick="goHome()">← ড্যাশবোর্ডে ফিরে যান</button>
+        <input type="tel" id="stu_mobile" placeholder="০১৭xxxxxxxx">
+        <button class="submit-btn" onclick="saveStudent()">💾 তথ্য সেভ করুন</button>
+        <button class="back-btn" onclick="goHome('student_page')">← ড্যাশবোর্ডে ফিরে যান</button>
     </div>
+
+    <!-- ২/ শিক্ষক নিবন্ধন -->
+    <div id="teacher_page" class="page">
+        <h2 style="text-align:center; color:#1a5d1a;">শিক্ষক নিবন্ধন</h2>
+        <div id="tea_success" class="success-msg">✅ শিক্ষকের তথ্য সেভ হয়েছে!</div>
+        <label>শিক্ষক আইডি (অটোমেটিক):</label>
+        <input type="text" id="teach_id" readonly style="background:#eee;">
+        <label>শিক্ষকের নাম:</label>
+        <input type="text" id="t_name" placeholder="পুরো নাম লিখুন">
+        <label>পদবী:</label>
+        <select id="t_desig">
+            <option>প্রধান শিক্ষক</option><option>সহকারী শিক্ষক</option>
+            <option>মুহতামিম</option><option>ক্বারী</option><option>অন্যান্য</option>
+        </select>
+        <label>ঠিকানা:</label>
+        <textarea id="t_address" placeholder="ঠিকানা লিখুন" rows="2"></textarea>
+        <label>মোবাইল নাম্বার:</label>
+        <input type="tel" id="t_mobile" placeholder="০১৭xxxxxxxx">
+        <button class="submit-btn" onclick="saveTeacher()">💾 তথ্য সেভ করুন</button>
+        <button class="back-btn" onclick="goHome('teacher_page')">← ড্যাশবোর্ডে ফিরে যান</button>
+        <div style="margin-top:20px;">
+            <h3 style="color:#1a5d1a; border-bottom:2px solid #1a5d1a; padding-bottom:5px;">নিবন্ধিত শিক্ষকদের তালিকা</h3>
+            <div id="tea_list" class="loading">তালিকা লোড হচ্ছে...</div>
+        </div>
+    </div>
+
+    <!-- ৩/ আয় এন্ট্রি -->
+    <div id="income_page" class="page">
+        <h2 style="text-align:center; color:#1a5d1a;">আয় এন্ট্রি</h2>
+        <div id="inc_success" class="success-msg">✅ আয়ের তথ্য সেভ হয়েছে!</div>
+        <div style="background:#e8f5e9; padding:12px; border-radius:8px; margin-bottom:15px;">
+            <label>ছাত্র আইডি দিয়ে সার্চ:</label>
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="inc_search_id" placeholder="যেমন: STU-123456" style="margin:0; flex:3;">
+                <button onclick="searchStudentForIncome()" style="flex:1; background:#1a5d1a; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">সার্চ</button>
+            </div>
+            <div style="margin-top:8px; font-size:14px; font-weight:bold;">
+                নাম: <span id="inc_res_name">---</span> &nbsp;|&nbsp; শ্রেণী: <span id="inc_res_class">---</span>
+            </div>
+        </div>
+        <label>মাস:</label>
+        <select id="inc_month">
+            <option>জানুয়ারি</option><option>ফেব্রুয়ারি</option><option>মার্চ</option><option>এপ্রিল</option>
+            <option>মে</option><option>জুন</option><option>জুলাই</option><option>আগস্ট</option>
+            <option>সেপ্টেম্বর</option><option>অক্টোবর</option><option>নভেম্বর</option><option>ডিসেম্বর</option>
+        </select>
+        <label>আয়ের খাত:</label>
+        <select id="inc_category">
+            <option>বেতন বাবদ</option><option>ভর্তি বাবদ</option><option>পরীক্ষার ফি</option>
+            <option>কারেন্ট বিল</option><option>আবাসিক খোরাকি</option><option>অন্যান্য</option>
+        </select>
+        <label>টাকার পরিমাণ (৳):</label>
+        <input type="number" id="inc_amount" placeholder="০.০০" style="font-size:18px; font-weight:bold;">
+        <button class="submit-btn" onclick="saveIncome()">💾 আয় সেভ করুন</button>
+        <button class="back-btn" onclick="goHome('income_page')">← ড্যাশবোর্ডে ফিরে যান</button>
+        <div style="margin-top:20px;">
+            <h3 style="color:#1a5d1a; border-bottom:2px solid #1a5d1a; padding-bottom:5px;">সাম্প্রতিক আয়ের তালিকা</h3>
+            <div id="inc_list" class="loading">লোড হচ্ছে...</div>
+        </div>
+    </div>
+
+    <!-- ৪/ ব্যয় এন্ট্রি -->
+    <div id="expense_page" class="page">
+        <h2 style="text-align:center; color:#c0392b;">ব্যয় এন্ট্রি</h2>
+        <div id="exp_success" class="success-msg" style="background:#ffebee; border-color:#c0392b; color:#c0392b;">✅ ব্যয়ের তথ্য সেভ হয়েছে!</div>
+        <label>মাস:</label>
+        <select id="exp_month">
+            <option>জানুয়ারি</option><option>ফেব্রুয়ারি</option><option>মার্চ</option><option>এপ্রিল</option>
+            <option>মে</option><option>জুন</option><option>জুলাই</option><option>আগস্ট</option>
+            <option>সেপ্টেম্বর</option><option>অক্টোবর</option><option>নভেম্বর</option><option>ডিসেম্বর</option>
+        </select>
+        <label>ব্যয়ের খাত:</label>
+        <select id="exp_category">
+            <option>শিক্ষক বেতন</option><option>বাজার বাবদ</option><option>আসবাবপত্র</option>
+            <option>মাদ্রাসা সামগ্রী</option><option>যাতায়াত খরচ</option><option>অন্যান্য</option>
+        </select>
+        <label>টাকার পরিমাণ (৳):</label>
+        <input type="number" id="exp_amount" placeholder="০.০০" style="font-size:18px; font-weight:bold; color:#c0392b;">
+        <label>বিবরণ (ঐচ্ছিক):</label>
+        <textarea id="exp_desc" placeholder="বিস্তারিত লিখুন..." rows="2"></textarea>
+        <button class="submit-btn" style="background:#c0392b;" onclick="saveExpense()">💾 ব্যয় সেভ করুন</button>
+        <button class="back-btn" onclick="goHome('expense_page')">← ড্যাশবোর্ডে ফিরে যান</button>
+        <div style="margin-top:20px;">
+            <h3 style="color:#c0392b; border-bottom:2px solid #c0392b; padding-bottom:5px;">সাম্প্রতিক ব্যয়ের তালিকা</h3>
+            <div id="exp_list" class="loading">লোড হচ্ছে...</div>
+        </div>
+    </div>
+
+    <!-- ৫/ রশিদ পেইজ -->
+    <div id="receipt_page" class="page" style="max-width:750px;">
+        <div class="no-print">
+            <h2 style="text-align:center; color:#1a5d1a;">রশিদ অনুসন্ধান ও প্রিন্ট</h2>
+            <div style="background:#e8f5e9; padding:12px; border-radius:8px; margin-bottom:15px; display:flex; gap:5px;">
+                <input type="text" id="search_receipt_id" placeholder="ছাত্র আইডি দিন" style="flex:3; margin:0;">
+                <button onclick="findReceipts()" style="flex:1; background:#1a5d1a; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold; padding:10px;">সার্চ</button>
+            </div>
+        </div>
+        <div id="printArea" style="border:3px double #1a5d1a; padding:25px; border-radius:10px; background:#fff;">
+            <div style="text-align:center; border-bottom:2px solid #1a5d1a; margin-bottom:15px; padding-bottom:10px;">
+                <h2 style="margin:0; color:#1a5d1a; font-size:20px;">হিফজুল কুরআন রশিদিয়া হোসাইনিয়া নূরানী মাদ্রাসা</h2>
+                <p style="margin:5px 0; font-size:13px;">সৈয়দ রশিদিয়া মঞ্জিল, বরিশাল সদর।</p>
+                <div style="margin-top:8px; background:#1a5d1a; color:white; display:inline-block; padding:4px 18px; border-radius:50px; font-weight:bold;">টাকা প্রাপ্তির রশিদ</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:10px;">
+                <span>ছাত্র আইডি: <span id="rec_id_val">---</span></span>
+                <span>তারিখ: <span id="rec_date_val">---</span></span>
+            </div>
+            <div style="line-height:2; margin-bottom:15px; font-size:15px;">
+                নাম: <strong id="rec_name_val">---</strong><br>
+                শ্রেণী: <strong id="rec_class_val">---</strong>
+            </div>
+            <table>
+                <thead><tr><th style="text-align:left;">বিবরণ</th><th>মাস</th><th style="text-align:right;">টাকা</th></tr></thead>
+                <tbody id="receipt_table_body">
+                    <tr><td colspan="3" style="text-align:center; color:#999;">আইডি দিয়ে সার্চ করুন</td></tr>
+                </tbody>
+                <tfoot>
+                    <tr style="font-weight:bold; background:#e8f5e9;">
+                        <td colspan="2" style="text-align:right;">সর্বমোট:</td>
+                        <td id="rec_total_val" style="text-align:right;">০.০০</td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div style="display:flex; justify-content:space-between; margin-top:50px;">
+                <div style="border-top:1px solid #000; width:130px; text-align:center; font-size:13px;">আদায়কারীর স্বাক্ষর</div>
+                <div style="border-top:1px solid #000; width:130px; text-align:center; font-size:13px;">মুহতামিম/অফিস</div>
+            </div>
+        </div>
+        <div class="no-print" style="display:flex; gap:10px; margin-top:15px;">
+            <button onclick="window.print()" style="flex:1; padding:14px; background:#2c3e50; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">🖨️ প্রিন্ট করুন</button>
+            <button onclick="goHome('receipt_page')" style="flex:1; padding:14px; background:#555; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">← ফিরুন</button>
+        </div>
+    </div>
+
+    <!-- ৬/ উপস্থিতি -->
+    <div id="attendance_page" class="page" style="max-width:750px;">
+        <h2 style="text-align:center; color:#1a5d1a;">শিক্ষার্থী হাজিরা</h2>
+        <div id="att_success" class="success-msg">✅ হাজিরা সেভ হয়েছে!</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; background:#f9f9f9; padding:12px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px;">
+            <div>
+                <label>তারিখ:</label>
+                <input type="text" id="att_date_val" readonly style="background:#eee; margin:0;">
+            </div>
+            <div>
+                <label>শ্রেণী নির্বাচন:</label>
+                <select id="select_class" onchange="loadStudentListForAtt()" style="margin:0;">
+                    <option value="">ক্লাস বেছে নিন</option>
+                    <option>প্লে</option><option>নার্সারি</option><option>প্রথম শ্রেণী</option>
+                    <option>দ্বিতীয় শ্রেণী</option><option>তৃতীয় শ্রেণী</option>
+                    <option>নূরানী</option><option>নাজেরা</option><option>হিফজ</option>
+                </select>
+            </div>
+        </div>
+        <div id="att_table_container" style="display:none;">
+            <div id="att_loading" class="loading">লোড হচ্ছে...</div>
+            <div style="overflow-x:auto;">
+                <table id="att_student_table" style="display:none;">
+                    <thead><tr><th>আইডি</th><th>নাম</th><th>উপস্থিত ✓</th></tr></thead>
+                    <tbody id="student_list_body"></tbody>
+                </table>
+            </div>
+            <div style="display:flex; justify-content:space-around; background:#e8f5e9; padding:12px; border-radius:8px; margin:12px 0; font-weight:bold; border:1px solid #1a5d1a;">
+                <div>মোট: <span id="total_st" style="color:blue;">০</span> জন</div>
+                <div>উপস্থিত: <span id="present_st" style="color:green;">০</span> জন</div>
+                <div>অনুপস্থিত: <span id="absent_st" style="color:red;">০</span> জন</div>
+            </div>
+            <button class="submit-btn" onclick="saveAttendance()">💾 হাজিরা সাবমিট করুন</button>
+        </div>
+        <button class="back-btn" onclick="goHome('attendance_page')">← ড্যাশবোর্ডে ফিরে যান</button>
+    </div>
+
+    <!-- ৭/ ফলাফল -->
+    <div id="result_page" class="page" style="max-width:750px;">
+        <h2 style="text-align:center; color:#1a5d1a;">ফলাফল ও নম্বর ব্যবস্থাপনা</h2>
+        <div id="res_success" class="success-msg">✅ নম্বর সেভ হয়েছে!</div>
+        <div style="display:flex; gap:5px; margin-bottom:15px;">
+            <button onclick="switchResTab('entry')" id="btn_ent" style="flex:1; padding:12px; cursor:pointer; background:#1a5d1a; color:white; border:none; border-radius:5px; font-weight:bold;">নম্বর এন্ট্রি</button>
+            <button onclick="switchResTab('view')" id="btn_viw" style="flex:1; padding:12px; cursor:pointer; background:#eee; color:#333; border:none; border-radius:5px; font-weight:bold;">ফলাফল দেখুন</button>
+        </div>
+        <div id="res_entry_sec" style="background:#f9f9f9; padding:15px; border-radius:8px; border:1px solid #ddd;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+                <div>
+                    <label>ছাত্র আইডি:</label>
+                    <input type="text" id="ent_stu_id" placeholder="আইডি লিখুন" style="margin:5px 0;">
+                </div>
+                <div>
+                    <label>বিভাগ:</label>
+                    <select id="ent_stu_class" onchange="updateSubjects()" style="margin:5px 0; border-color:#1a5d1a;">
+                        <option value="">নির্বাচন করুন</option>
+                        <option value="general">সাধারণ বিভাগ</option>
+                        <option value="hifz">হিফজ ও নাজেরা</option>
+                    </select>
+                </div>
+            </div>
+            <div id="subject_fields" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <p style="grid-column:1/-1; text-align:center; color:#999;">প্রথমে বিভাগ নির্বাচন করুন</p>
+            </div>
+            <button class="submit-btn" onclick="saveResult()" style="margin-top:12px;">💾 নম্বর সেভ করুন</button>
+        </div>
+        <div id="res_view_sec" style="display:none;">
+            <div style="background:#e8f5e9; padding:12px; border-radius:8px; margin-bottom:12px;">
+                <label>ছাত্র আইডি দিয়ে মার্কশিট খুঁজুন:</label>
+                <div style="display:flex; gap:5px; margin-top:5px;">
+                    <input type="text" id="view_stu_id" placeholder="আইডি লিখুন" style="flex:3; margin:0;">
+                    <button onclick="generateMarksheet()" style="flex:1; background:#1a5d1a; color:white; border:none; cursor:pointer; font-weight:bold; border-radius:5px; padding:10px;">সার্চ</button>
+                </div>
+            </div>
+            <div id="marksheet_output" style="border:2px solid #ddd; padding:20px; background:white; border-radius:5px; min-height:80px;">
+                <p style="text-align:center; color:#999;">আইডি দিয়ে সার্চ করুন</p>
+            </div>
+        </div>
+        <button class="back-btn" onclick="goHome('result_page')" style="margin-top:12px;">← ড্যাশবোর্ডে ফিরে যান</button>
+    </div>
+
+    <!-- ৮/ রিপোর্ট ও নোটিশ -->
+    <div id="other_page" class="page" style="max-width:800px;">
+        <h2 style="text-align:center; color:#1a5d1a;">রিপোর্ট ও নোটিশ বোর্ড</h2>
+        <div style="background:#fdfefe; border:1px solid #1a5d1a; padding:15px; border-radius:8px; margin-bottom:20px;">
+            <h4 style="margin-top:0; color:#1a5d1a;">📊 আয়-ব্যয় রিপোর্ট</h4>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+                <div>
+                    <label style="font-size:12px;">মাস নির্বাচন:</label>
+                    <select id="rep_month" style="padding:8px; width:100%; margin:0;">
+                        <option value="">সব মাস</option>
+                        <option>জানুয়ারি</option><option>ফেব্রুয়ারি</option><option>মার্চ</option><option>এপ্রিল</option>
+                        <option>মে</option><option>জুন</option><option>জুলাই</option><option>আগস্ট</option>
+                        <option>সেপ্টেম্বর</option><option>অক্টোবর</option><option>নভেম্বর</option><option>ডিসেম্বর</option>
+                    </select>
+                </div>
+                <div style="display:flex; align-items:flex-end;">
+                    <button onclick="loadReport()" style="width:100%; padding:10px; background:#1a5d1a; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">রিপোর্ট দেখুন</button>
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; text-align:center;">
+                <div style="background:#e8f5e9; padding:12px; border-radius:8px;">
+                    <div style="font-size:12px; color:#2e7d32;">মোট আয়</div>
+                    <h3 style="margin:5px 0; color:#2e7d32;">৳<span id="total_inc_rep">০</span></h3>
+                </div>
+                <div style="background:#ffebee; padding:12px; border-radius:8px;">
+                    <div style="font-size:12px; color:#c62828;">মোট ব্যয়</div>
+                    <h3 style="margin:5px 0; color:#c62828;">৳<span id="total_exp_rep">০</span></h3>
+                </div>
+                <div style="background:#e3f2fd; padding:12px; border-radius:8px;">
+                    <div style="font-size:12px; color:#1565c0;">অবশিষ্ট</div>
+                    <h3 style="margin:5px 0; color:#1565c0;">৳<span id="balance_rep">০</span></h3>
+                </div>
+            </div>
+        </div>
+        <div style="background:#fff9c4; border:1px solid #fbc02d; padding:15px; border-radius:8px;">
+            <h4 style="margin-top:0; color:#f57f17;">📢 নোটিশ বোর্ড</h4>
+            <textarea id="notice_input" placeholder="নতুন নোটিশ লিখুন..." style="height:70px; border-color:#fbc02d;"></textarea>
+            <button onclick="publishNotice()" style="width:100%; padding:10px; background:#f57f17; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">নোটিশ পাবলিশ করুন</button>
+            <div id="notice_list" style="margin-top:12px; background:white; padding:10px; border-radius:5px; border:1px dashed #fbc02d; min-height:50px; font-size:13px;">
+                <p style="color:#666; text-align:center;">লোড হচ্ছে...</p>
+            </div>
+        </div>
+        <button class="back-btn" onclick="goHome('other_page')" style="margin-top:20px;">← ড্যাশবোর্ডে ফিরে যান</button>
+    </div>
+
+    <!-- AI সহকারী পেজ -->
+    <div id="ai_page" class="page" style="max-width:700px;">
+        <div style="background:linear-gradient(135deg,#1a1a2e,#16213e); color:white; padding:15px; border-radius:10px; margin-bottom:15px; text-align:center;">
+            <h2 style="margin:0; font-size:18px;">🤖 AI সহকারী</h2>
+            <p style="margin:5px 0 0; font-size:13px; opacity:0.8;">যেকোনো সমস্যা বাংলায় লিখুন — AI সমাধান দেবে</p>
+        </div>
+        <div id="ai_chat_box" style="background:#f9f9f9; border:1px solid #ddd; border-radius:8px; padding:12px; min-height:300px; max-height:400px; overflow-y:auto; margin-bottom:10px; font-size:14px; line-height:1.6;">
+            <div style="background:#e8f5e9; padding:10px; border-radius:8px; margin-bottom:8px;">
+                <strong>🤖 AI:</strong> আসসালামুয়ালাইকুম! আমি আপনার মাদ্রাসা অ্যাপের AI সহকারী। আপনার যেকোনো সমস্যা বা পরিবর্তনের কথা বলুন, আমি সাহায্য করব! 😊
+            </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+            <textarea id="ai_input" placeholder="এখানে আপনার সমস্যা বা প্রশ্ন লিখুন..." style="flex:1; height:70px; margin:0; font-size:14px; border-color:#1a1a2e;"></textarea>
+            <button onclick="sendAIMessage()" id="ai_send_btn" style="width:70px; background:linear-gradient(135deg,#1a1a2e,#16213e); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:20px;">➤</button>
+        </div>
+        <button class="back-btn" onclick="goHome('ai_page')" style="margin-top:10px;">← ড্যাশবোর্ডে ফিরে যান</button>
+    </div>
+
 </div>
 
 <script>
-    function openStudent() {
-        document.getElementById('dashboard').style.display = 'none';
-        document.getElementById('student_page').style.display = 'block';
-        document.getElementById('stu_id').value = "ID-" + Math.floor(1000 + Math.random() * 9000);
+function openPage(pageId, initFn) {
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById(pageId).style.display = 'block';
+    if(initFn) initFn();
+}
+function goHome(pageId) {
+    document.getElementById(pageId).style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+}
+function showSuccess(id) {
+    let el = document.getElementById(id);
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 3000);
+}
+function genId(prefix) { return prefix + "-" + Date.now().toString().slice(-6); }
+function makeTable(headers, rows) {
+    if(!rows || rows.length === 0) return '<p style="text-align:center; color:#999; padding:10px;">কোনো তথ্য নেই।</p>';
+    let html = '<div style="overflow-x:auto;"><table><thead><tr>';
+    headers.forEach(h => html += '<th>' + h + '</th>');
+    html += '</tr></thead><tbody>';
+    rows.forEach(r => { html += '<tr>'; r.forEach(c => html += '<td>' + (c||'---') + '</td>'); html += '</tr>'; });
+    return html + '</tbody></table></div>';
+}
+
+function updateClassOptions() {
+    let division = document.getElementById('stu_division').value;
+    let classSelect = document.getElementById('stu_class');
+    classSelect.innerHTML = '';
+    let options = [];
+    if(division === 'নূরানী') {
+        options = ['প্লে','নার্সারি','প্রথম শ্রেণী','দ্বিতীয় শ্রেণী','তৃতীয় শ্রেণী'];
+    } else if(division === 'নাজেরা') {
+        options = ['নাজেরা বিভাগ'];
+    } else if(division === 'হিফজ') {
+        options = ['হিফজ বিভাগ'];
+    } else {
+        options = ['-- আগে বিভাগ নির্বাচন করুন --'];
+    }
+    options.forEach(o => { let opt=document.createElement('option'); opt.value=o; opt.innerText=o; classSelect.appendChild(opt); });
+}
+// ১/ ছাত্র
+function initStudent() { document.getElementById('stu_id').value = genId('STU'); }
+function saveStudent() {
+    let id = document.getElementById('stu_id').value;
+    let name = document.getElementById('stu_name').value.trim();
+    if(!name) { alert("ছাত্রের নাম লিখুন!"); return; }
+    db.ref('students/' + id).set({ id, name, father: document.getElementById('stu_father').value.trim(), division: document.getElementById('stu_division').value, class: document.getElementById('stu_class').value, address: document.getElementById('stu_address').value.trim(), mobile: document.getElementById('stu_mobile').value.trim(), date: new Date().toLocaleDateString('bn-BD') })
+    .then(() => { showSuccess('stu_success'); ['stu_name','stu_father','stu_address','stu_mobile'].forEach(f => document.getElementById(f).value=''); document.getElementById('stu_id').value=genId('STU'); })
+    .catch(e => alert("সেভ হয়নি!\n" + e.message));
+}
+function loadStudentList() {}
+
+// ২/ শিক্ষক
+function initTeacher() { document.getElementById('teach_id').value = genId('TEA'); loadTeacherList(); }
+function saveTeacher() {
+    let id = document.getElementById('teach_id').value;
+    let name = document.getElementById('t_name').value.trim();
+    if(!name) { alert("শিক্ষকের নাম লিখুন!"); return; }
+    db.ref('teachers/' + id).set({ id, name, designation: document.getElementById('t_desig').value, address: document.getElementById('t_address').value.trim(), mobile: document.getElementById('t_mobile').value.trim(), date: new Date().toLocaleDateString('bn-BD') })
+    .then(() => { showSuccess('tea_success'); ['t_name','t_address','t_mobile'].forEach(f => document.getElementById(f).value=''); document.getElementById('teach_id').value=genId('TEA'); loadTeacherList(); })
+    .catch(e => alert("সেভ হয়নি!\n" + e.message));
+}
+function loadTeacherList() {
+    document.getElementById('tea_list').innerHTML = '<p class="loading">লোড হচ্ছে...</p>';
+    db.ref('teachers').once('value', snap => {
+        let rows = [];
+        snap.forEach(c => { let t=c.val(); rows.unshift([t.id,t.name,t.designation,t.mobile]); });
+        document.getElementById('tea_list').innerHTML = makeTable(['আইডি','নাম','পদবী','মোবাইল'], rows);
+    });
+}
+
+// ৩/ আয়
+function initIncome() { loadIncomeList(); }
+function searchStudentForIncome() {
+    let id = document.getElementById('inc_search_id').value.trim();
+    if(!id) { alert("আইডি লিখুন"); return; }
+    db.ref('students/' + id).once('value', snap => {
+        if(snap.exists()) { let s=snap.val(); document.getElementById('inc_res_name').innerText=s.name; document.getElementById('inc_res_class').innerText=s.class; }
+        else { document.getElementById('inc_res_name').innerText="পাওয়া যায়নি"; document.getElementById('inc_res_class').innerText="---"; }
+    });
+}
+function saveIncome() {
+    let amount = parseFloat(document.getElementById('inc_amount').value);
+    if(!amount||amount<=0) { alert("সঠিক টাকার পরিমাণ দিন!"); return; }
+    let key = db.ref('income').push().key;
+    db.ref('income/' + key).set({ key, studentId: document.getElementById('inc_search_id').value.trim()||'---', studentName: document.getElementById('inc_res_name').innerText, month: document.getElementById('inc_month').value, category: document.getElementById('inc_category').value, amount, date: new Date().toLocaleDateString('bn-BD') })
+    .then(() => { showSuccess('inc_success'); document.getElementById('inc_amount').value=''; document.getElementById('inc_search_id').value=''; document.getElementById('inc_res_name').innerText='---'; document.getElementById('inc_res_class').innerText='---'; loadIncomeList(); })
+    .catch(e => alert("সেভ হয়নি!\n" + e.message));
+}
+function loadIncomeList() {
+    document.getElementById('inc_list').innerHTML = '<p class="loading">লোড হচ্ছে...</p>';
+    db.ref('income').limitToLast(20).once('value', snap => {
+        let rows = [];
+        snap.forEach(c => { let i=c.val(); rows.unshift([i.studentId,i.studentName,i.category,i.month,'৳'+i.amount,i.date]); });
+        document.getElementById('inc_list').innerHTML = makeTable(['আইডি','নাম','খাত','মাস','পরিমাণ','তারিখ'], rows);
+    });
+}
+
+// ৪/ ব্যয়
+function initExpense() { loadExpenseList(); }
+function saveExpense() {
+    let amount = parseFloat(document.getElementById('exp_amount').value);
+    if(!amount||amount<=0) { alert("সঠিক টাকার পরিমাণ দিন!"); return; }
+    let key = db.ref('expenses').push().key;
+    db.ref('expenses/' + key).set({ key, month: document.getElementById('exp_month').value, category: document.getElementById('exp_category').value, amount, description: document.getElementById('exp_desc').value.trim(), date: new Date().toLocaleDateString('bn-BD') })
+    .then(() => { showSuccess('exp_success'); document.getElementById('exp_amount').value=''; document.getElementById('exp_desc').value=''; loadExpenseList(); })
+    .catch(e => alert("সেভ হয়নি!\n" + e.message));
+}
+function loadExpenseList() {
+    document.getElementById('exp_list').innerHTML = '<p class="loading">লোড হচ্ছে...</p>';
+    db.ref('expenses').limitToLast(20).once('value', snap => {
+        let rows = [];
+        snap.forEach(c => { let e=c.val(); rows.unshift([e.category,e.month,'৳'+e.amount,e.description||'---',e.date]); });
+        document.getElementById('exp_list').innerHTML = makeTable(['খাত','মাস','পরিমাণ','বিবরণ','তারিখ'], rows);
+    });
+}
+
+// ৫/ রশিদ
+function initReceipt() {}
+function findReceipts() {
+    let id = document.getElementById('search_receipt_id').value.trim();
+    if(!id) { alert("ছাত্র আইডি দিন"); return; }
+    db.ref('students/' + id).once('value', snap => {
+        if(snap.exists()) { let s=snap.val(); document.getElementById('rec_id_val').innerText=id; document.getElementById('rec_name_val').innerText=s.name; document.getElementById('rec_class_val').innerText=s.class; document.getElementById('rec_date_val').innerText=new Date().toLocaleDateString('bn-BD'); }
+        else { document.getElementById('rec_name_val').innerText="পাওয়া যায়নি"; }
+    });
+    db.ref('income').orderByChild('studentId').equalTo(id).once('value', snap => {
+        let rows='', total=0;
+        snap.forEach(c => { let i=c.val(); total+=i.amount; rows+='<tr><td style="border:1px solid #1a5d1a; padding:10px;">'+i.category+'</td><td style="border:1px solid #1a5d1a; padding:10px; text-align:center;">'+i.month+'</td><td style="border:1px solid #1a5d1a; padding:10px; text-align:right;">৳'+i.amount+'</td></tr>'; });
+        document.getElementById('receipt_table_body').innerHTML = rows||'<tr><td colspan="3" style="text-align:center; color:#999; padding:10px; border:1px solid #1a5d1a;">কোনো আয় এন্ট্রি নেই</td></tr>';
+        document.getElementById('rec_total_val').innerText = '৳' + total;
+    });
+}
+
+// ৬/ উপস্থিতি
+function initAttendance() { document.getElementById('att_date_val').value = new Date().toLocaleDateString('bn-BD'); }
+function loadStudentListForAtt() {
+    let cls = document.getElementById('select_class').value;
+    if(!cls) { document.getElementById('att_table_container').style.display='none'; return; }
+    document.getElementById('att_table_container').style.display='block';
+    document.getElementById('att_loading').style.display='block';
+    document.getElementById('att_student_table').style.display='none';
+    db.ref('students').orderByChild('class').equalTo(cls).once('value', snap => {
+        document.getElementById('att_loading').style.display='none';
+        let body='', count=0;
+        snap.forEach(c => { let s=c.val(); count++; body+='<tr><td>'+s.id+'</td><td>'+s.name+'</td><td style="text-align:center;"><input type="checkbox" data-id="'+s.id+'" data-name="'+s.name+'" onchange="calculateAttendance()" style="width:20px; height:20px; cursor:pointer;"></td></tr>'; });
+        document.getElementById('student_list_body').innerHTML = count===0 ? '<tr><td colspan="3" style="text-align:center; padding:15px; color:#999;">এই শ্রেণীতে কোনো ছাত্র নেই।</td></tr>' : body;
+        document.getElementById('att_student_table').style.display='table';
+        document.getElementById('total_st').innerText=count;
+        document.getElementById('present_st').innerText='০';
+        document.getElementById('absent_st').innerText=count;
+    });
+}
+function calculateAttendance() {
+    let total=parseInt(document.getElementById('total_st').innerText), present=0;
+    document.querySelectorAll('#student_list_body input[type="checkbox"]').forEach(cb => { if(cb.checked) present++; });
+    document.getElementById('present_st').innerText=present;
+    document.getElementById('absent_st').innerText=total-present;
+}
+function saveAttendance() {
+    let cls=document.getElementById('select_class').value, date=document.getElementById('att_date_val').value;
+    let checkboxes=document.querySelectorAll('#student_list_body input[type="checkbox"]');
+    if(checkboxes.length===0) { alert("আগে শ্রেণী নির্বাচন করুন"); return; }
+    let presentList=[], absentList=[];
+    checkboxes.forEach(cb => { if(cb.checked) presentList.push(cb.dataset.id); else absentList.push(cb.dataset.id); });
+    let key=db.ref('attendance').push().key;
+    db.ref('attendance/'+key).set({ key, class:cls, date, presentList, absentList, presentCount:presentList.length, absentCount:absentList.length })
+    .then(() => showSuccess('att_success'))
+    .catch(e => alert("সেভ হয়নি!\n"+e.message));
+}
+
+// ৭/ ফলাফল
+function initResult() {}
+function switchResTab(tab) {
+    document.getElementById('res_entry_sec').style.display=tab==='entry'?'block':'none';
+    document.getElementById('res_view_sec').style.display=tab==='view'?'block':'none';
+    document.getElementById('btn_ent').style.background=tab==='entry'?'#1a5d1a':'#eee';
+    document.getElementById('btn_ent').style.color=tab==='entry'?'white':'#333';
+    document.getElementById('btn_viw').style.background=tab==='view'?'#1a5d1a':'#eee';
+    document.getElementById('btn_viw').style.color=tab==='view'?'white':'#333';
+}
+function updateSubjects() {
+    let dept=document.getElementById('ent_stu_class').value, fields=document.getElementById('subject_fields');
+    fields.innerHTML='';
+    let subs=dept==='general'?['বাংলা','অংক','ইংরেজি','আরবী ১ম','আরবী ২য়','দোয়া ও হাদিস','মাসআলা']:dept==='hifz'?['কুরআন মাজিদ','তাজবীদ','দোয়া','মাসআলা']:[];
+    subs.forEach((s,i) => { fields.innerHTML+='<div><label style="font-size:13px;">'+s+':</label><input type="number" id="sub_'+i+'" placeholder="০-১০০" min="0" max="100" style="margin-top:4px;"></div>'; });
+    fields.dataset.subjects=JSON.stringify(subs);
+}
+function saveResult() {
+    let id=document.getElementById('ent_stu_id').value.trim(), dept=document.getElementById('ent_stu_class').value;
+    let subjects=JSON.parse(document.getElementById('subject_fields').dataset.subjects||'[]');
+    if(!id||!dept) { alert("আইডি ও বিভাগ দিন!"); return; }
+    if(subjects.length===0) { alert("বিভাগ নির্বাচন করুন!"); return; }
+    let marks={}, total=0;
+    subjects.forEach((s,i) => { let v=parseInt(document.getElementById('sub_'+i).value)||0; marks[s]=v; total+=v; });
+    let avg=(total/subjects.length).toFixed(1);
+    let grade=avg>=90?'A+':avg>=80?'A':avg>=70?'A-':avg>=60?'B':avg>=50?'C':'F';
+    let key=db.ref('results').push().key;
+    db.ref('results/'+key).set({ key, studentId:id, department:dept, marks, total, average:parseFloat(avg), grade, date:new Date().toLocaleDateString('bn-BD') })
+    .then(() => { showSuccess('res_success'); document.getElementById('ent_stu_id').value=''; updateSubjects(); })
+    .catch(e => alert("সেভ হয়নি!\n"+e.message));
+}
+function generateMarksheet() {
+    let id=document.getElementById('view_stu_id').value.trim();
+    if(!id) { alert("আইডি লিখুন"); return; }
+    document.getElementById('marksheet_output').innerHTML='<p style="text-align:center;">লোড হচ্ছে...</p>';
+    Promise.all([db.ref('students/'+id).once('value'), db.ref('results').orderByChild('studentId').equalTo(id).limitToLast(1).once('value')]).then(([stuSnap, resSnap]) => {
+        let name=stuSnap.exists()?stuSnap.val().name:'অজানা', cls=stuSnap.exists()?stuSnap.val().class:'---';
+        if(!resSnap.exists()) { document.getElementById('marksheet_output').innerHTML='<p style="text-align:center; color:#999;">কোনো ফলাফল নেই।</p>'; return; }
+        let r; resSnap.forEach(c => r=c.val());
+        let mHtml=''; for(let [s,m] of Object.entries(r.marks)) mHtml+='<p style="margin:5px 0;">'+s+': <strong>'+m+'</strong></p>';
+        document.getElementById('marksheet_output').innerHTML='<div style="text-align:center;"><h3 style="color:#1a5d1a; margin:0;">ব্যক্তিগত মার্কশিট</h3><p>আইডি: <b>'+id+'</b> | নাম: <b>'+name+'</b> | শ্রেণী: <b>'+cls+'</b></p><hr><div style="text-align:left; font-size:14px; line-height:1.8;">'+mHtml+'</div><hr><p>মোট: <b>'+r.total+'</b> | গড়: <b>'+r.average+'</b></p><h3 style="color:'+(r.grade==='F'?'red':'green')+'; margin:10px 0;">গ্রেড: '+r.grade+' '+(r.grade==='F'?'(অনুত্তীর্ণ)':'(উত্তীর্ণ)')+'</h3></div>';
+    }).catch(e => { document.getElementById('marksheet_output').innerHTML='<p style="color:red;">লোড হয়নি: '+e.message+'</p>'; });
+}
+
+// ৮/ রিপোর্ট ও নোটিশ
+function initOther() { loadNotices(); loadReport(); }
+function loadReport() {
+    let month=document.getElementById('rep_month').value, incTotal=0, expTotal=0;
+    Promise.all([
+        db.ref('income').once('value', snap => { snap.forEach(c => { let i=c.val(); if(!month||i.month===month) incTotal+=i.amount||0; }); }),
+        db.ref('expenses').once('value', snap => { snap.forEach(c => { let e=c.val(); if(!month||e.month===month) expTotal+=e.amount||0; }); })
+    ]).then(() => {
+        document.getElementById('total_inc_rep').innerText=incTotal.toFixed(2);
+        document.getElementById('total_exp_rep').innerText=expTotal.toFixed(2);
+        document.getElementById('balance_rep').innerText=(incTotal-expTotal).toFixed(2);
+    });
+}
+function publishNotice() {
+    let text=document.getElementById('notice_input').value.trim();
+    if(!text) { alert("নোটিশ লিখুন!"); return; }
+    let key=db.ref('notices').push().key;
+    db.ref('notices/'+key).set({ key, text, date:new Date().toLocaleDateString('bn-BD') })
+    .then(() => { document.getElementById('notice_input').value=''; loadNotices(); })
+    .catch(e => alert("সেভ হয়নি!\n"+e.message));
+}
+function loadNotices() {
+    document.getElementById('notice_list').innerHTML='<p style="text-align:center; color:#999;">লোড হচ্ছে...</p>';
+    db.ref('notices').limitToLast(10).once('value', snap => {
+        if(!snap.exists()) { document.getElementById('notice_list').innerHTML='<p style="color:#666; text-align:center;">কোনো নোটিশ নেই।</p>'; return; }
+        let items=[]; snap.forEach(c => items.unshift(c.val()));
+        document.getElementById('notice_list').innerHTML = items.map(n => '<div style="border-bottom:1px solid #eee; padding:8px 0;"><small style="color:red;">তারিখ: '+n.date+'</small><br><strong>'+n.text+'</strong></div>').join('');
+    });
+}
+
+// AI সহকারী
+let aiHistory = [];
+function initAI() { aiHistory = []; }
+
+async function sendAIMessage() {
+    let input = document.getElementById('ai_input').value.trim();
+    if(!input) return;
+
+    let chatBox = document.getElementById('ai_chat_box');
+    let btn = document.getElementById('ai_send_btn');
+
+    // ইউজারের মেসেজ দেখান
+    chatBox.innerHTML += '<div style="background:#dce8ff; padding:10px; border-radius:8px; margin-bottom:8px; text-align:right;"><strong>আপনি:</strong> ' + input + '</div>';
+    document.getElementById('ai_input').value = '';
+    btn.disabled = true;
+    btn.innerText = '⏳';
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // AI history তে যোগ করুন
+    aiHistory.push({ role: 'user', content: input });
+
+    try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'claude-sonnet-4-20250514',
+                max_tokens: 1000,
+                system: 'আপনি একটি মাদ্রাসা ম্যানেজমেন্ট অ্যাপের AI সহকারী। এই অ্যাপে ছাত্র নিবন্ধন, শিক্ষক নিবন্ধন, আয়-ব্যয়, রশিদ, উপস্থিতি, ফলাফল এবং নোটিশ মডিউল আছে। Firebase Realtime Database ব্যবহার করা হচ্ছে। সবসময় বাংলায় উত্তর দিন। সমস্যার সমাধান সহজভাবে বলুন।',
+                messages: aiHistory
+            })
+        });
+
+        const data = await response.json();
+        let reply = data.content && data.content[0] ? data.content[0].text : 'উত্তর পাওয়া যায়নি।';
+
+        aiHistory.push({ role: 'assistant', content: reply });
+        chatBox.innerHTML += '<div style="background:#e8f5e9; padding:10px; border-radius:8px; margin-bottom:8px;"><strong>🤖 AI:</strong> ' + reply.replace(/\n/g,'<br>') + '</div>';
+
+    } catch(e) {
+        chatBox.innerHTML += '<div style="background:#ffebee; padding:10px; border-radius:8px; margin-bottom:8px;"><strong>⚠️ Error:</strong> ইন্টারনেট সংযোগ চেক করুন।</div>';
     }
 
-    function goHome() {
-        document.getElementById('student_page').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
+    btn.disabled = false;
+    btn.innerText = '➤';
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// Enter চাপলে পাঠানো যাবে
+document.addEventListener('keydown', function(e) {
+    if(e.key === 'Enter' && !e.shiftKey && document.getElementById('ai_input') === document.activeElement) {
+        e.preventDefault();
+        sendAIMessage();
     }
+});
 </script>
-
 </body>
 </html>
-<div id="teacher_page" style="display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: left; max-width: 600px; margin: auto;">
-    <h2 style="text-align:center; color:#1a5d1a;">শিক্ষক নিবন্ধন</h2>
-    
-    <label style="font-weight:bold;">শিক্ষক আইডি (অটোমেটিক):</label>
-    <input type="text" id="teach_id" readonly style="width: 100%; padding: 10px; margin: 8px 0; background:#eee; border: 1px solid #ccc; border-radius: 5px;">
-    
-    <label style="font-weight:bold;">শিক্ষকের নাম:</label>
-    <input type="text" id="t_name" placeholder="পুরো নাম লিখুন" style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;">
-    
-    <label style="font-weight:bold;">পদবী:</label>
-    <select id="t_desig" style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;">
-        <option>প্রধান শিক্ষক</option>
-        <option>সহকারী শিক্ষক</option>
-        <option>মুহতামিম</option>
-        <option>ক্বারী</option>
-        <option>অন্যান্য</option>
-    </select>
-    
-    <label style="font-weight:bold;">ঠিকানা:</label>
-    <textarea id="t_address" placeholder="ঠিকানা লিখুন" style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;"></textarea>
-    
-    <label style="font-weight:bold;">মোবাইল নাম্বার:</label>
-    <input type="tel" id="t_mobile" placeholder="০১৭xxxxxxxx" style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;">
-    
-    <button class="submit-btn" style="background: #1a5d1a; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer;">তথ্য সেভ করুন</button>
-    <button class="back-btn" onclick="goHomeFromTeacher()" style="background: #555; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; margin-top: 10px; cursor: pointer;">← ড্যাশবোর্ডে ফিরে যান</button>
-</div>
-
-<script>
-    // ২ নম্বর শিক্ষক নিবন্ধন বাটন কাজ করানোর জন্য
-    document.querySelectorAll('.menu-btn')[1].onclick = function() {
-        document.getElementById('dashboard').style.display = 'none';
-        document.getElementById('teacher_page').style.display = 'block';
-        document.getElementById('teach_id').value = "TID-" + Math.floor(2000 + Math.random() * 8000);
-    };
-
-    function goHomeFromTeacher() {
-        document.getElementById('teacher_page').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-    }
-</script>
-<div id="income_page" style="display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: left; max-width: 600px; margin: auto;">
-    <h2 style="text-align:center; color:#1a5d1a;">আয় এন্ট্রি (রশিদ)</h2>
-    
-    <div style="background: #e8f5e9; padding: 10px; border-radius: 5px; margin-bottom: 15px; display: flex; gap: 5px;">
-        <input type="text" id="search_id" placeholder="ছাত্র আইডি দিয়ে সার্চ দিন" style="flex: 3; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
-        <button onclick="searchStudent()" style="flex: 1; background: #1a5d1a; color: white; border: none; border-radius: 5px; cursor: pointer;">সার্চ</button>
-    </div>
-
-    <div style="margin-bottom: 10px; font-weight: bold; color: #555;">
-        নাম: <span id="res_name" style="color: #000;">---</span> | 
-        শ্রেণী: <span id="res_class" style="color: #000;">---</span>
-    </div>
-
-    <div style="display: flex; gap: 10px;">
-        <div style="flex: 1;">
-            <label>মাস নির্বাচন করুন:</label>
-            <select id="inc_month" style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;">
-                <option>জানুয়ারি</option><option>ফেব্রুয়ারি</option><option>মার্চ</option><option>এপ্রিল</option>
-                <option>মে</option><option>জুন</option><option>জুলাই</option><option>আগস্ট</option>
-                <option>সেপ্টেম্বর</option><option>অক্টোবর</option><option>নভেম্বর</option><option>ডিসেম্বর</option>
-            </select>
-        </div>
-        <div style="flex: 1;">
-            <label>তারিখ:</label>
-            <input type="text" id="inc_date" readonly style="width: 100%; padding: 10px; margin: 8px 0; background:#eee; border: 1px solid #ccc; border-radius: 5px;">
-        </div>
-    </div>
-
-    <label>আয়ের খাত:</label>
-    <select style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;">
-        <option>বেতন বাবদ</option>
-        <option>ভর্তি বাবদ</option>
-        <option>পরীক্ষার ফি</option>
-        <option>কারেন্ট বিল</option>
-        <option>আবাসিক খোরাকি</option>
-        <option>অন্যান্য</option>
-    </select>
-
-    <label>টাকার পরিমাণ:</label>
-    <input type="number" placeholder="০.০০" style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; font-size: 18px; font-weight: bold;">
-
-    <button class="submit-btn" style="background: #1a5d1a; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer;">আয় সেভ করুন</button>
-    <button class="back-btn" onclick="goHomeFromIncome()" style="background: #555; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; margin-top: 10px; cursor: pointer;">← ড্যাশবোর্ডে ফিরে যান</button>
-</div>
-
-<script>
-    // ৩ নম্বর আয় এন্ট্রি বাটন কাজ করানোর জন্য
-    document.querySelectorAll('.menu-btn')[2].onclick = function() {
-        document.getElementById('dashboard').style.display = 'none';
-        document.getElementById('income_page').style.display = 'block';
-        
-        // অটো তারিখ বসানো
-        let today = new Date();
-        document.getElementById('inc_date').value = today.toLocaleDateString('bn-BD');
-    };
-
-    function searchStudent() {
-        let id = document.getElementById('search_id').value;
-        if(id) {
-            // ডেমো তথ্য শো করা (পরবর্তীতে ডাটাবেজ থেকে আসবে)
-            document.getElementById('res_name').innerText = "আব্দুল্লাহ আল মামুন";
-            document.getElementById('res_class').innerText = "হিফজ";
-        } else {
-            alert("অনুগ্রহ করে আইডি দিন");
-        }
-    }
-
-    function goHomeFromIncome() {
-        document.getElementById('income_page').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-    }
-</script>
-<div id="expense_page" style="display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: left; max-width: 600px; margin: auto;">
-    <h2 style="text-align:center; color:#c0392b;">ব্যয় এন্ট্রি</h2>
-    
-    <div style="display: flex; gap: 10px;">
-        <div style="flex: 1;">
-            <label style="font-weight:bold;">মাস নির্বাচন:</label>
-            <select id="exp_month" style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;">
-                <option>জানুয়ারি</option><option>ফেব্রুয়ারি</option><option>মার্চ</option><option>এপ্রিল</option>
-                <option>মে</option><option>জুন</option><option>জুলাই</option><option>আগস্ট</option>
-                <option>সেপ্টেম্বর</option><option>অক্টোবর</option><option>নভেম্বর</option><option>ডিসেম্বর</option>
-            </select>
-        </div>
-        <div style="flex: 1;">
-            <label style="font-weight:bold;">তারিখ:</label>
-            <input type="text" id="exp_date" readonly style="width: 100%; padding: 10px; margin: 8px 0; background:#f9f9f9; border: 1px solid #ccc; border-radius: 5px;">
-        </div>
-    </div>
-
-    <label style="font-weight:bold;">ব্যয়ের খাত:</label>
-    <select style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;">
-        <option>শিক্ষক বেতন</option>
-        <option>বাজার বাবদ</option>
-        <option>আসবাবপত্র</option>
-        <option>মাদ্রাসা সামগ্রী</option>
-        <option>যাতায়াত খরচ</option>
-        <option>অন্যান্য</option>
-    </select>
-
-    <label style="font-weight:bold;">টাকার পরিমাণ:</label>
-    <input type="number" placeholder="০.০০" style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; font-size: 18px; color: #c0392b; font-weight: bold;">
-
-    <label style="font-weight:bold;">খরচের বিবরণ (ঐচ্ছিক):</label>
-    <textarea placeholder="বিস্তারিত এখানে লিখুন..." style="width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px;"></textarea>
-
-    <button class="submit-btn" style="background: #c0392b; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer;">ব্যয় সেভ করুন</button>
-    <button class="back-btn" onclick="goHomeFromExpense()" style="background: #555; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; margin-top: 10px; cursor: pointer;">← ড্যাশবোর্ডে ফিরে যান</button>
-</div>
-
-<script>
-    // ৪ নম্বর ব্যয় এন্ট্রি বাটন কাজ করানোর জন্য
-    document.querySelectorAll('.menu-btn')[3].onclick = function() {
-        document.getElementById('dashboard').style.display = 'none';
-        document.getElementById('expense_page').style.display = 'block';
-        
-        // অটো তারিখ সেট করা
-        let today = new Date();
-        document.getElementById('exp_date').value = today.toLocaleDateString('bn-BD');
-    };
-
-    function goHomeFromExpense() {
-        document.getElementById('expense_page').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-    }
-</script>
-<div id="receipt_page" style="display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 700px; margin: auto;">
-    
-    <div class="no-print">
-        <h2 style="text-align:center; color:#1a5d1a;">রশিদ অনুসন্ধান ও ডাউনলোড</h2>
-        <div style="background: #e8f5e9; padding: 15px; border-radius: 5px; margin-bottom: 20px; display: flex; gap: 5px;">
-            <input type="text" id="search_receipt_id" placeholder="ছাত্র আইডি লিখে সার্চ দিন" style="flex: 3; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
-            <button onclick="findReceipts()" style="flex: 1; background: #1a5d1a; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">সার্চ</button>
-        </div>
-    </div>
-
-    <div id="printArea" style="border: 3px double #1a5d1a; padding: 30px; border-radius: 10px; background: #fff; position: relative;">
-        
-        <div style="text-align: center; border-bottom: 2px solid #1a5d1a; margin-bottom: 15px; padding-bottom: 10px;">
-            <h2 style="margin: 0; color: #1a5d1a; font-size: 24px;">হিফজুল কুরআন রশিদিয়া হোসাইনিয়া নূরানী মাদ্রাসা</h2>
-            <p style="margin: 5px 0; font-size: 15px;">সৈয়দ রশিদিয়া মঞ্জিল, বরিশাল সদর।</p>
-            <div style="margin-top: 10px; background: #1a5d1a; color: white; display: inline-block; padding: 5px 20px; border-radius: 50px; font-weight: bold;">টাকা প্রাপ্তির রশিদ</div>
-        </div>
-
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: bold;">
-            <span>ছাত্র আইডি: <span id="rec_id_val">---</span></span>
-            <span>তারিখ: <span id="rec_date_val">---</span></span>
-        </div>
-        
-        <div style="text-align: left; line-height: 2; margin-bottom: 15px; font-size: 16px;">
-            নাম: <strong id="rec_name_val">---</strong> <br>
-            শ্রেণী: <strong id="rec_class_val">---</strong>
-        </div>
-
-        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-            <thead>
-                <tr style="background: #f4f4f4;">
-                    <th style="border: 1px solid #1a5d1a; padding: 12px; text-align: left;">টাকা প্রদানের বিবরণ (খাত)</th>
-                    <th style="border: 1px solid #1a5d1a; padding: 12px; text-align: center;">মাস</th>
-                    <th style="border: 1px solid #1a5d1a; padding: 12px; text-align: right;">টাকার পরিমাণ</th>
-                </tr>
-            </thead>
-            <tbody id="receipt_table_body">
-                <tr>
-                    <td style="border: 1px solid #1a5d1a; padding: 12px;">---</td>
-                    <td style="border: 1px solid #1a5d1a; padding: 12px; text-align: center;">---</td>
-                    <td style="border: 1px solid #1a5d1a; padding: 12px; text-align: right;">০.০০</td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr style="font-weight: bold; background: #e8f5e9;">
-                    <td colspan="2" style="border: 1px solid #1a5d1a; padding: 12px; text-align: right;">সর্বমোট টাকা:</td>
-                    <td id="rec_total_val" style="border: 1px solid #1a5d1a; padding: 12px; text-align: right;">০.০০</td>
-                </tr>
-            </tfoot>
-        </table>
-
-        <div style="display: flex; justify-content: space-between; margin-top: 60px;">
-            <div style="border-top: 1px solid #000; width: 140px; text-align: center; font-size: 14px;">আদায়কারীর স্বাক্ষর</div>
-            <div style="border-top: 1px solid #000; width: 140px; text-align: center; font-size: 14px;">মুহতামিম/অফিস</div>
-        </div>
-    </div>
-
-    <div class="no-print" style="margin-top: 25px; display: flex; gap: 10px;">
-        <button onclick="window.print()" style="flex: 1; padding: 15px; background: #2c3e50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px;">⬇ রশিদ ডাউনলোড / প্রিন্ট</button>
-        <button onclick="goHomeFromReceipt()" style="flex: 1; padding: 15px; background: #555; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">← ড্যাশবোর্ডে ফিরুন</button>
-    </div>
-</div>
-
-<style>
-    /* প্রিন্ট করার সময় বাটন এবং অপ্রয়োজনীয় জিনিস লুকানোর জন্য */
-    @media print {
-        .no-print, .header, .welcome, .menu-grid { display: none !important; }
-        body { background: white; padding: 0; }
-        #receipt_page { display: block !important; box-shadow: none; max-width: 100%; margin: 0; padding: 0; }
-        .container { width: 100%; padding: 0; }
-    }
-</style>
-
-<script>
-    // ৫ নম্বর রশিদ পেইজ বাটন অ্যাক্টিভ করা
-    document.querySelectorAll('.menu-btn')[4].onclick = function() {
-        document.getElementById('dashboard').style.display = 'none';
-        document.getElementById('receipt_page').style.display = 'block';
-    };
-
-    // আইডি দিয়ে তথ্য খোঁজার ডেমো ফাংশন
-    function findReceipts() {
-        let id = document.getElementById('search_receipt_id').value;
-        if(id) {
-            // আপাতত ডেমো তথ্য দেখাচ্ছে, পরে ডাটাবেজ কানেক্ট হবে
-            document.getElementById('rec_id_val').innerText = id;
-            document.getElementById('rec_date_val').innerText = new Date().toLocaleDateString('bn-BD');
-            document.getElementById('rec_name_val').innerText = "মোহাম্মদ আব্দুল্লাহ";
-            document.getElementById('rec_class_val').innerText = "নূরানী (৩য় শ্রেণী)";
-            
-            document.getElementById('receipt_table_body').innerHTML = `
-                <tr>
-                    <td style="border: 1px solid #1a5d1a; padding: 12px;">মাসিক বেতন</td>
-                    <td style="border: 1px solid #1a5d1a; padding: 12px; text-align: center;">ফেব্রুয়ারি</td>
-                    <td style="border: 1px solid #1a5d1a; padding: 12px; text-align: right;">৫০০.০০</td>
-                </tr>
-            `;
-            document.getElementById('rec_total_val').innerText = "৫০০.০০";
-        } else {
-            alert("অনুগ্রহ করে ছাত্র আইডি দিন");
-        }
-    }
-
-    function goHomeFromReceipt() {
-        document.getElementById('receipt_page').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-    }
-</script><div id="attendance_page" style="display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 700px; margin: auto;">
-    <h2 style="text-align:center; color:#1a5d1a;">শিক্ষার্থী হাজিরা (Attendance)</h2>
-    
-    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr;
